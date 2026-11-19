@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
@@ -7,6 +8,12 @@ import inertia from '@inertiajs/vite';
 import { wayfinder } from '@laravel/vite-plugin-wayfinder';
 
 export default defineConfig({
+    resolve: {
+        alias: {
+            '@': fileURLToPath(new URL('./resources/js', import.meta.url)),
+        },
+    },
+
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
@@ -24,6 +31,7 @@ export default defineConfig({
             formVariants: true,
         }),
     ],
+
     server: {
         watch: {
             ignored: [

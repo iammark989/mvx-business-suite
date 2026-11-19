@@ -2,11 +2,11 @@ export type User = {
     id: number;
     name: string;
     email: string;
-    avatar?: string;
+    profile_photo_url: string | null;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
-    created_at: string;
-    updated_at: string;
+    created_at?: string;
+    updated_at?: string;
     [key: string]: unknown;
 };
 

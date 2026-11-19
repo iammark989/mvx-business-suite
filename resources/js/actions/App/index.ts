@@ -1,6 +1,6 @@
 import Http from './Http'
-const Passkeys = {
+const App = {
     Http: Object.assign(Http, Http),
 }
 
-export default Passkeys
+export default App

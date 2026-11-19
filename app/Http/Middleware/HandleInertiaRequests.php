@@ -39,7 +39,16 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? [
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'email' => $request->user()->email,
+                    'email_verified_at' => $request->user()->email_verified_at,
+                    'profile_photo_url' => $request->user()->profile_photo_path
+                        ? \Illuminate\Support\Facades\Storage::disk('public')
+                            ->url($request->user()->profile_photo_path)
+                        : null,
+                ] : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

@@ -133,74 +133,67 @@ logout.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     
     logout.form = logoutForm
 /**
-* @see \Laravel\Fortify\Http\Controllers\RegisteredUserController::register
- * @see vendor/laravel/fortify/src/Http/Controllers/RegisteredUserController.php:41
- * @route '/register'
+ * @see routes/web.php:8
+ * @route '/'
  */
-export const register = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: register.url(options),
+export const home = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: home.url(options),
     method: 'get',
 })
 
-register.definition = {
+home.definition = {
     methods: ["get","head"],
-    url: '/register',
+    url: '/',
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see \Laravel\Fortify\Http\Controllers\RegisteredUserController::register
- * @see vendor/laravel/fortify/src/Http/Controllers/RegisteredUserController.php:41
- * @route '/register'
+ * @see routes/web.php:8
+ * @route '/'
  */
-register.url = (options?: RouteQueryOptions) => {
-    return register.definition.url + queryParams(options)
+home.url = (options?: RouteQueryOptions) => {
+    return home.definition.url + queryParams(options)
 }
 
 /**
-* @see \Laravel\Fortify\Http\Controllers\RegisteredUserController::register
- * @see vendor/laravel/fortify/src/Http/Controllers/RegisteredUserController.php:41
- * @route '/register'
+ * @see routes/web.php:8
+ * @route '/'
  */
-register.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: register.url(options),
+home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: home.url(options),
     method: 'get',
 })
 /**
-* @see \Laravel\Fortify\Http\Controllers\RegisteredUserController::register
- * @see vendor/laravel/fortify/src/Http/Controllers/RegisteredUserController.php:41
- * @route '/register'
+ * @see routes/web.php:8
+ * @route '/'
  */
-register.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
-    url: register.url(options),
+home.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: home.url(options),
     method: 'head',
 })
 
     /**
-* @see \Laravel\Fortify\Http\Controllers\RegisteredUserController::register
- * @see vendor/laravel/fortify/src/Http/Controllers/RegisteredUserController.php:41
- * @route '/register'
+ * @see routes/web.php:8
+ * @route '/'
  */
-    const registerForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: register.url(options),
+    const homeForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: home.url(options),
         method: 'get',
     })
 
             /**
-* @see \Laravel\Fortify\Http\Controllers\RegisteredUserController::register
- * @see vendor/laravel/fortify/src/Http/Controllers/RegisteredUserController.php:41
- * @route '/register'
+ * @see routes/web.php:8
+ * @route '/'
  */
-        registerForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: register.url(options),
+        homeForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: home.url(options),
             method: 'get',
         })
             /**
-* @see \Laravel\Fortify\Http\Controllers\RegisteredUserController::register
- * @see vendor/laravel/fortify/src/Http/Controllers/RegisteredUserController.php:41
- * @route '/register'
+ * @see routes/web.php:8
+ * @route '/'
  */
-        registerForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: register.url({
+        homeForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: home.url({
                         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
                             _method: 'HEAD',
                             ...(options?.query ?? options?.mergeQuery ?? {}),
@@ -209,4 +202,74 @@ register.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
             method: 'get',
         })
     
-    register.form = registerForm
+    home.form = homeForm
+/**
+ * @see routes/web.php:15
+ * @route '/admin/dashboard'
+ */
+export const dashboard = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: dashboard.url(options),
+    method: 'get',
+})
+
+dashboard.definition = {
+    methods: ["get","head"],
+    url: '/admin/dashboard',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+ * @see routes/web.php:15
+ * @route '/admin/dashboard'
+ */
+dashboard.url = (options?: RouteQueryOptions) => {
+    return dashboard.definition.url + queryParams(options)
+}
+
+/**
+ * @see routes/web.php:15
+ * @route '/admin/dashboard'
+ */
+dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: dashboard.url(options),
+    method: 'get',
+})
+/**
+ * @see routes/web.php:15
+ * @route '/admin/dashboard'
+ */
+dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: dashboard.url(options),
+    method: 'head',
+})
+
+    /**
+ * @see routes/web.php:15
+ * @route '/admin/dashboard'
+ */
+    const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: dashboard.url(options),
+        method: 'get',
+    })
+
+            /**
+ * @see routes/web.php:15
+ * @route '/admin/dashboard'
+ */
+        dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: dashboard.url(options),
+            method: 'get',
+        })
+            /**
+ * @see routes/web.php:15
+ * @route '/admin/dashboard'
+ */
+        dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: dashboard.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    dashboard.form = dashboardForm

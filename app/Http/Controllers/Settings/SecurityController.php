@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Http\Controllers\Settings;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+use Inertia\Inertia;
+use Inertia\Response;
+use Laravel\Fortify\Features;
+
+class SecurityController extends Controller
+{
+    public function edit(Request $request): Response
+    {
+        return Inertia::render('settings/security', [
+            'passwordRules' => Password::defaults()->toPasswordRulesString(),
+            'canManageTwoFactor' => Features::enabled(
+                Features::twoFactorAuthentication()
+            ),
+            'requiresConfirmation' => Features::optionEnabled(
+                Features::twoFactorAuthentication(),
+                'confirm'
+            ),
+            'twoFactorEnabled' => $request->user()->hasEnabledTwoFactorAuthentication(),
+        ]);
+    }
+
+    public function update(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => [
+                'required',
+                'confirmed',
+                Password::defaults(),
+            ],
+        ]);
+
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return back()->with('success', 'Password updated successfully.');
+    }
+}

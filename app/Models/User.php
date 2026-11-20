@@ -10,8 +10,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'profile_photo_path'])]
+#[Fillable(['name', 'email', 'password', 'profile_photo_path', 'is_active'])]
 #[Hidden([
     'password',
     'two_factor_secret',
@@ -21,7 +22,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
 
     /**
      * Get the attributes that should be cast.
@@ -34,6 +35,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'is_active' => 'boolean',
         ];
     }
 }

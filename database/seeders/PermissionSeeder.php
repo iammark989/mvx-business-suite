@@ -26,8 +26,9 @@ class PermissionSeeder extends Seeder
             // User Management
             'users.view',
             'users.create',
-            'users.update',
-            'users.deactivate',
+            'users.update-identity',
+            'users.reset-password',
+            'users.manage-status',
             'users.assign-roles',
 
             // Roles and Permissions
@@ -135,8 +136,8 @@ class PermissionSeeder extends Seeder
 
                 'users.view',
                 'users.create',
-                'users.update',
-                'users.deactivate',
+                'users.reset-password',
+                'users.manage-status',
                 'users.assign-roles',
 
                 'items.view',
@@ -238,6 +239,10 @@ class PermissionSeeder extends Seeder
 
                 'reports.view',
                 'reports.export',
+
+                'users.view',
+                'users.reset-password',
+                'users.manage-status',
             ],
 
             /*

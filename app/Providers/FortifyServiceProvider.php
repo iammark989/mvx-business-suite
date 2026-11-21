@@ -13,6 +13,7 @@ use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
+use App\Actions\Fortify\ResetUserPassword;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -30,6 +31,8 @@ class FortifyServiceProvider extends ServiceProvider
 
     private function configureAuthentication(): void
     {
+        Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
+
         Fortify::authenticateUsing(function (Request $request) {
             $username = Fortify::username();
 

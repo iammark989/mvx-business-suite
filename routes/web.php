@@ -51,11 +51,19 @@ Route::middleware(['auth', 'verified'])
                 ->name('users.store');
 
             Route::get('/users/{user}/edit', [UserController::class, 'edit'])
-                ->middleware('can:users.update')
+                ->middleware('can:users.update-identity')
                 ->name('users.edit');
-            
+
             Route::put('/users/{user}', [UserController::class, 'update'])
-                ->middleware('can:users.update')
+                ->middleware('can:users.update-identity')
                 ->name('users.update');
+            
+            Route::put('/users/{user}/password', [UserController::class, 'resetPassword'])
+                ->middleware('can:users.reset-password')
+                ->name('users.reset-password');
+                
+            Route::patch('/users/{user}/status', [UserController::class, 'updateStatus'])
+                ->middleware('can:users.manage-status')
+                ->name('users.update-status');    
 
     });

@@ -12,6 +12,7 @@ use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Password as PasswordBroker;
 
 class UserController extends Controller
 {
@@ -88,11 +89,11 @@ class UserController extends Controller
      */
     public function edit(Request $request, User $user): Response
     {
-        abort_if(
-            $user->hasRole('System Administrator') &&
-            ! $request->user()->hasRole('System Administrator'),
-            403
-        );
+            // Only System Administrator can access identity-editing pages.
+        Gate::authorize('users.update-identity');
+
+        // Protect the reserved System Administrator account from editing.
+        abort_if($user->hasRole('System Administrator'), 403);
 
         $roles = Role::query()
             ->where('guard_name', 'web')
@@ -168,18 +169,17 @@ class UserController extends Controller
             ->route('users.index')
             ->with('success', 'User account created successfully.');
     }
-
-
+    
     /**
-     * Update the specified user.
+     * Update the identity and role of the specified user.
      */
     public function update(Request $request, User $user): RedirectResponse
     {
+        // Only System Administrator can modify user identity information.
+        Gate::authorize('users.update-identity');
+
         // Protect the reserved System Administrator account.
         abort_if($user->hasRole('System Administrator'), 403);
-
-        // Role assignment requires its own permission.
-        Gate::authorize('users.assign-roles');
 
         $assignableRoles = Role::query()
             ->where('guard_name', 'web')
@@ -202,7 +202,6 @@ class UserController extends Controller
                 'string',
                 Rule::in($assignableRoles),
             ],
-            'is_active' => ['required', 'boolean'],
         ]);
 
         // Reset email verification if the email address changes.
@@ -212,7 +211,6 @@ class UserController extends Controller
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->is_active = $validated['is_active'];
         $user->save();
 
         // Ensure the user has exactly one assigned role.
@@ -222,5 +220,78 @@ class UserController extends Controller
             ->route('users.index')
             ->with('success', 'User account updated successfully.');
     }
+
+    /**
+     * Send a password reset link to the specified user's email.
+     */
+    public function resetPassword(Request $request, User $user): RedirectResponse
+    {
+        Gate::authorize('users.reset-password');
+
+        // Protect the System Administrator account.
+        abort_if($user->hasRole('System Administrator'), 403);
+
+        // Managers cannot send reset links to Administrator accounts.
+        abort_if(
+            $user->hasRole('Administrator') &&
+            ! $request->user()->hasRole('System Administrator'),
+            403
+        );
+
+        // Send the password reset link.
+        $status = PasswordBroker::sendResetLink([
+            'email' => $user->email,
+        ]);
+
+        if ($status === PasswordBroker::RESET_LINK_SENT) {
+            return redirect()
+                ->route('users.index')
+                ->with('success', 'Password reset link sent to the user email address.');
+        }
+
+        return redirect()
+            ->route('users.index')
+            ->withErrors([
+                'email' => __($status),
+            ]);
+    }
+
+    /**
+     * Activate or deactivate the specified user account.
+     */
+    public function updateStatus(Request $request, User $user): RedirectResponse
+    {
+        Gate::authorize('users.manage-status');
+
+        // Protect the System Administrator account.
+        abort_if($user->hasRole('System Administrator'), 403);
+
+        // Prevent users from deactivating their own accounts.
+        abort_if($request->user()->id === $user->id, 403);
+
+        // Managers cannot manage Administrator accounts.
+        abort_if(
+            $user->hasRole('Administrator') &&
+            ! $request->user()->hasRole('System Administrator'),
+            403
+        );
+
+        $validated = $request->validate([
+            'is_active' => ['required', 'boolean'],
+        ]);
+
+        $user->update([
+            'is_active' => $validated['is_active'],
+        ]);
+
+        $message = $validated['is_active']
+            ? 'User account activated successfully.'
+            : 'User account deactivated successfully.';
+
+        return redirect()
+            ->route('users.index')
+            ->with('success', $message);
+    }
+
 
 }

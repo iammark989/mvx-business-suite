@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Illuminate\Support\Facades\Gate;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -49,6 +50,21 @@ class HandleInertiaRequests extends Middleware
                             ->url($request->user()->profile_photo_path)
                         : null,
                 ] : null,
+                'permissions' => $request->user()
+                    ? collect([
+                        'dashboard.view',
+                        'purchase-orders.view',
+                        'goods-receipts.view',
+                        'items.view',
+                        'warehouses.view',
+                        'inventory.view',
+                        'users.view',
+                        'roles.view',
+                        'settings.view',
+                    ])->filter(fn ($permission) => Gate::forUser($request->user())->allows($permission))
+                        ->values()
+                        ->all()
+                    : [],
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

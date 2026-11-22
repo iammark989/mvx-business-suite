@@ -23,7 +23,7 @@ class CreateAdministrator extends Command
     public function handle(): int
     {
         // Prevent accidentally creating another initial administrator.
-        if (User::role('Administrator', 'web')->exists()) {
+        if (User::role('System Administrator', 'web')->exists()) {
             $this->error('An Administrator account already exists.');
 
             return self::FAILURE;
@@ -31,7 +31,7 @@ class CreateAdministrator extends Command
 
         // Retrieve the Administrator role.
         $role = Role::query()
-            ->where('name', 'Administrator')
+            ->where('name', 'System Administrator')
             ->where('guard_name', 'web')
             ->first();
 
@@ -102,7 +102,7 @@ class CreateAdministrator extends Command
         $this->line("Name: {$user->name}");
         $this->line("Email: {$user->email}");
         $this->line('Account status: Active');
-        $this->line('Assigned role: Administrator');
+        $this->line('Assigned role: System Administrator');
 
         return self::SUCCESS;
     }

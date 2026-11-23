@@ -60,6 +60,12 @@ class HandleInertiaRequests extends Middleware
                         'uoms.update',
                         'uoms.manage-status',
 
+                        // Categories
+                        'categories.view',
+                        'categories.create',
+                        'categories.update',
+                        'categories.manage-status',
+
                         'purchase-orders.view',
                         'goods-receipts.view',
                         'items.view',

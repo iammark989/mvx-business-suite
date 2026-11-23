@@ -49,9 +49,13 @@ class PermissionSeeder extends Seeder
             'uoms.update',
             'uoms.manage-status',
 
-            // Categories and Brands
+            // Categories
             'categories.view',
-            'categories.manage',
+            'categories.create',
+            'categories.update',
+            'categories.manage-status',
+
+            // Brands
             'brands.view',
             'brands.manage',
 
@@ -156,7 +160,10 @@ class PermissionSeeder extends Seeder
                 'uoms.manage-status',
 
                 'categories.view',
-                'categories.manage',
+                'categories.create',
+                'categories.update',
+                'categories.manage-status',
+
                 'brands.view',
                 'brands.manage',
 
@@ -218,7 +225,10 @@ class PermissionSeeder extends Seeder
                 'uoms.manage-status',
 
                 'categories.view',
-                'categories.manage',
+                'categories.create',
+                'categories.update',
+                'categories.manage-status',
+
                 'brands.view',
                 'brands.manage',
 
@@ -272,6 +282,7 @@ class PermissionSeeder extends Seeder
 
                 'items.view',
                 'uoms.view',
+                'categories.view',
                 'customers.view',
                 'suppliers.view',
                 'warehouses.view',
@@ -299,6 +310,7 @@ class PermissionSeeder extends Seeder
 
                 'items.view',
                 'uoms.view',
+                'categories.view',
                 'customers.view',
                 'customers.create',
                 'customers.update',
@@ -325,6 +337,7 @@ class PermissionSeeder extends Seeder
 
                 'items.view',
                 'uoms.view',
+                'categories.view',
                 'suppliers.view',
                 'warehouses.view',
 
@@ -350,6 +363,7 @@ class PermissionSeeder extends Seeder
 
                 'items.view',
                 'uoms.view',
+                'categories.view',
                 'suppliers.view',
                 'suppliers.create',
                 'suppliers.update',

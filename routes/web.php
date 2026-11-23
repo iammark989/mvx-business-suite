@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UomController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Settings\ProfileController;
@@ -90,6 +91,31 @@ Route::middleware(['auth', 'verified'])
 
             Route::patch('/uoms/{uom}/status', [UomController::class, 'updateStatus'])
                 ->middleware('can:uoms.manage-status')
-                ->name('uoms.update-status');    
+                ->name('uoms.update-status');
+                
+              // Category Management
+            Route::get('/categories', [CategoryController::class, 'index'])
+                ->middleware('can:categories.view')
+                ->name('categories.index');
+
+            Route::get('/categories/create', [CategoryController::class, 'create'])
+                ->middleware('can:categories.create')
+                ->name('categories.create');
+
+            Route::post('/categories', [CategoryController::class, 'store'])
+                ->middleware('can:categories.create')
+                ->name('categories.store');
+
+            Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])
+                ->middleware('can:categories.update')
+                ->name('categories.edit');
+
+            Route::put('/categories/{category}', [CategoryController::class, 'update'])
+                ->middleware('can:categories.update')
+                ->name('categories.update');
+
+            Route::patch('/categories/{category}/status', [CategoryController::class, 'updateStatus'])
+                ->middleware('can:categories.manage-status')
+                ->name('categories.update-status');    
 
     });

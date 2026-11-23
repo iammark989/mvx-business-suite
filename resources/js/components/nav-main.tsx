@@ -6,6 +6,7 @@ import {
     Package,
     Ruler,
     ShieldCheck,
+    Tags,
     Users,
 } from 'lucide-react';
 
@@ -36,16 +37,21 @@ export function NavMain() {
     const canViewDashboard = auth.permissions.includes('dashboard.view');
     const canViewUsers = auth.permissions.includes('users.view');
     const canViewUoms = auth.permissions.includes('uoms.view');
+    const canViewCategories = auth.permissions.includes('categories.view');
 
     const isUsersSectionActive = isCurrentOrParentUrl(users.index());
     const isUomsSectionActive = isCurrentOrParentUrl('/admin/uoms');
+    const isCategoriesSectionActive = isCurrentOrParentUrl('/admin/categories');
+
+    const isMasterDataSectionActive =
+        isUomsSectionActive || isCategoriesSectionActive;
 
     const [administrationOpen, setAdministrationOpen] = useState(
         isUsersSectionActive,
     );
 
     const [masterDataOpen, setMasterDataOpen] = useState(
-        isUomsSectionActive,
+        isMasterDataSectionActive,
     );
 
     useEffect(() => {
@@ -55,10 +61,10 @@ export function NavMain() {
     }, [isUsersSectionActive]);
 
     useEffect(() => {
-        if (isUomsSectionActive) {
+        if (isMasterDataSectionActive) {
             setMasterDataOpen(true);
         }
-    }, [isUomsSectionActive]);
+    }, [isMasterDataSectionActive]);
 
     return (
         <>
@@ -81,7 +87,7 @@ export function NavMain() {
                 </SidebarGroup>
             )}
 
-            {canViewUoms && (
+            {(canViewUoms || canViewCategories) && (
                 <SidebarGroup className="px-2 py-0">
                     <Collapsible
                         open={masterDataOpen}
@@ -93,7 +99,7 @@ export function NavMain() {
                                 <CollapsibleTrigger asChild>
                                     <SidebarMenuButton
                                         tooltip="Master Data"
-                                        isActive={isUomsSectionActive}
+                                        isActive={isMasterDataSectionActive}
                                     >
                                         <Package />
                                         <span>Master Data</span>
@@ -109,17 +115,33 @@ export function NavMain() {
 
                                 <CollapsibleContent>
                                     <SidebarMenuSub>
-                                        <SidebarMenuSubItem>
-                                            <SidebarMenuSubButton
-                                                asChild
-                                                isActive={isUomsSectionActive}
-                                            >
-                                                <Link href="/admin/uoms" prefetch>
-                                                    <Ruler />
-                                                    <span>Unit of Measure</span>
-                                                </Link>
-                                            </SidebarMenuSubButton>
-                                        </SidebarMenuSubItem>
+                                        {canViewUoms && (
+                                            <SidebarMenuSubItem>
+                                                <SidebarMenuSubButton
+                                                    asChild
+                                                    isActive={isUomsSectionActive}
+                                                >
+                                                    <Link href="/admin/uoms" prefetch>
+                                                        <Ruler />
+                                                        <span>Unit of Measure</span>
+                                                    </Link>
+                                                </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
+                                        )}
+
+                                        {canViewCategories && (
+                                            <SidebarMenuSubItem>
+                                                <SidebarMenuSubButton
+                                                    asChild
+                                                    isActive={isCategoriesSectionActive}
+                                                >
+                                                    <Link href="/admin/categories" prefetch>
+                                                        <Tags />
+                                                        <span>Categories</span>
+                                                    </Link>
+                                                </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
+                                        )}
                                     </SidebarMenuSub>
                                 </CollapsibleContent>
                             </SidebarMenuItem>

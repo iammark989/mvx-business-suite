@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronDown, LayoutGrid, ShieldCheck, Users } from 'lucide-react';
+import {
+    ChevronDown,
+    LayoutGrid,
+    Package,
+    Ruler,
+    ShieldCheck,
+    Users,
+} from 'lucide-react';
 
 import {
     Collapsible,
@@ -28,11 +35,17 @@ export function NavMain() {
 
     const canViewDashboard = auth.permissions.includes('dashboard.view');
     const canViewUsers = auth.permissions.includes('users.view');
+    const canViewUoms = auth.permissions.includes('uoms.view');
 
     const isUsersSectionActive = isCurrentOrParentUrl(users.index());
+    const isUomsSectionActive = isCurrentOrParentUrl('/admin/uoms');
 
     const [administrationOpen, setAdministrationOpen] = useState(
         isUsersSectionActive,
+    );
+
+    const [masterDataOpen, setMasterDataOpen] = useState(
+        isUomsSectionActive,
     );
 
     useEffect(() => {
@@ -40,6 +53,12 @@ export function NavMain() {
             setAdministrationOpen(true);
         }
     }, [isUsersSectionActive]);
+
+    useEffect(() => {
+        if (isUomsSectionActive) {
+            setMasterDataOpen(true);
+        }
+    }, [isUomsSectionActive]);
 
     return (
         <>
@@ -59,6 +78,53 @@ export function NavMain() {
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>
+                </SidebarGroup>
+            )}
+
+            {canViewUoms && (
+                <SidebarGroup className="px-2 py-0">
+                    <Collapsible
+                        open={masterDataOpen}
+                        onOpenChange={setMasterDataOpen}
+                        className="group/collapsible"
+                    >
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <CollapsibleTrigger asChild>
+                                    <SidebarMenuButton
+                                        tooltip="Master Data"
+                                        isActive={isUomsSectionActive}
+                                    >
+                                        <Package />
+                                        <span>Master Data</span>
+                                        <ChevronDown
+                                            className={`ml-auto transition-transform duration-200 ${
+                                                masterDataOpen
+                                                    ? 'rotate-180'
+                                                    : ''
+                                            }`}
+                                        />
+                                    </SidebarMenuButton>
+                                </CollapsibleTrigger>
+
+                                <CollapsibleContent>
+                                    <SidebarMenuSub>
+                                        <SidebarMenuSubItem>
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={isUomsSectionActive}
+                                            >
+                                                <Link href="/admin/uoms" prefetch>
+                                                    <Ruler />
+                                                    <span>Unit of Measure</span>
+                                                </Link>
+                                            </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
+                                    </SidebarMenuSub>
+                                </CollapsibleContent>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </Collapsible>
                 </SidebarGroup>
             )}
 

@@ -43,6 +43,12 @@ class PermissionSeeder extends Seeder
             'items.create',
             'items.update',
 
+            // Units of Measure
+            'uoms.view',
+            'uoms.create',
+            'uoms.update',
+            'uoms.manage-status',
+
             // Categories and Brands
             'categories.view',
             'categories.manage',
@@ -144,6 +150,11 @@ class PermissionSeeder extends Seeder
                 'items.create',
                 'items.update',
 
+                'uoms.view',
+                'uoms.create',
+                'uoms.update',
+                'uoms.manage-status',
+
                 'categories.view',
                 'categories.manage',
                 'brands.view',
@@ -201,6 +212,11 @@ class PermissionSeeder extends Seeder
                 'items.create',
                 'items.update',
 
+                'uoms.view',
+                'uoms.create',
+                'uoms.update',
+                'uoms.manage-status',
+
                 'categories.view',
                 'categories.manage',
                 'brands.view',
@@ -255,6 +271,7 @@ class PermissionSeeder extends Seeder
                 'dashboard.view',
 
                 'items.view',
+                'uoms.view',
                 'customers.view',
                 'suppliers.view',
                 'warehouses.view',
@@ -281,7 +298,7 @@ class PermissionSeeder extends Seeder
                 'dashboard.view',
 
                 'items.view',
-
+                'uoms.view',
                 'customers.view',
                 'customers.create',
                 'customers.update',
@@ -307,6 +324,7 @@ class PermissionSeeder extends Seeder
                 'dashboard.view',
 
                 'items.view',
+                'uoms.view',
                 'suppliers.view',
                 'warehouses.view',
 
@@ -331,7 +349,7 @@ class PermissionSeeder extends Seeder
                 'dashboard.view',
 
                 'items.view',
-
+                'uoms.view',
                 'suppliers.view',
                 'suppliers.create',
                 'suppliers.update',

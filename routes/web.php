@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UomController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
@@ -64,6 +65,31 @@ Route::middleware(['auth', 'verified'])
                 
             Route::patch('/users/{user}/status', [UserController::class, 'updateStatus'])
                 ->middleware('can:users.manage-status')
-                ->name('users.update-status');    
+                ->name('users.update-status');
+                
+            // Unit of Measure Management
+            Route::get('/uoms', [UomController::class, 'index'])
+                ->middleware('can:uoms.view')
+                ->name('uoms.index');
+
+            Route::get('/uoms/create', [UomController::class, 'create'])
+                ->middleware('can:uoms.create')
+                ->name('uoms.create');
+
+            Route::post('/uoms', [UomController::class, 'store'])
+                ->middleware('can:uoms.create')
+                ->name('uoms.store');
+
+            Route::get('/uoms/{uom}/edit', [UomController::class, 'edit'])
+                ->middleware('can:uoms.update')
+                ->name('uoms.edit');
+
+            Route::put('/uoms/{uom}', [UomController::class, 'update'])
+                ->middleware('can:uoms.update')
+                ->name('uoms.update');
+
+            Route::patch('/uoms/{uom}/status', [UomController::class, 'updateStatus'])
+                ->middleware('can:uoms.manage-status')
+                ->name('uoms.update-status');    
 
     });

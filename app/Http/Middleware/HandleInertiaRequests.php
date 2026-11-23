@@ -53,6 +53,13 @@ class HandleInertiaRequests extends Middleware
                 'permissions' => $request->user()
                     ? collect([
                         'dashboard.view',
+
+                        // Unit of Measure
+                        'uoms.view',
+                        'uoms.create',
+                        'uoms.update',
+                        'uoms.manage-status',
+
                         'purchase-orders.view',
                         'goods-receipts.view',
                         'items.view',

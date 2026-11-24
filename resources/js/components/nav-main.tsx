@@ -7,6 +7,7 @@ import {
     Ruler,
     ShieldCheck,
     Tags,
+    Truck,
     Users,
 } from 'lucide-react';
 
@@ -38,20 +39,24 @@ export function NavMain() {
     const canViewUsers = auth.permissions.includes('users.view');
     const canViewUoms = auth.permissions.includes('uoms.view');
     const canViewCategories = auth.permissions.includes('categories.view');
+    const canViewSuppliers = auth.permissions.includes('suppliers.view');
 
     const isUsersSectionActive = isCurrentOrParentUrl(users.index());
     const isUomsSectionActive = isCurrentOrParentUrl('/admin/uoms');
     const isCategoriesSectionActive = isCurrentOrParentUrl('/admin/categories');
+    const isSuppliersSectionActive = isCurrentOrParentUrl('/admin/suppliers');
 
-    const isMasterDataSectionActive =
-        isUomsSectionActive || isCategoriesSectionActive;
+    const isBusinessSetupSectionActive =
+        isUomsSectionActive ||
+        isCategoriesSectionActive ||
+        isSuppliersSectionActive;
 
     const [administrationOpen, setAdministrationOpen] = useState(
         isUsersSectionActive,
     );
 
-    const [masterDataOpen, setMasterDataOpen] = useState(
-        isMasterDataSectionActive,
+    const [businessSetupOpen, setBusinessSetupOpen] = useState(
+        isBusinessSetupSectionActive,
     );
 
     useEffect(() => {
@@ -61,10 +66,10 @@ export function NavMain() {
     }, [isUsersSectionActive]);
 
     useEffect(() => {
-        if (isMasterDataSectionActive) {
-            setMasterDataOpen(true);
+        if (isBusinessSetupSectionActive) {
+            setBusinessSetupOpen(true);
         }
-    }, [isMasterDataSectionActive]);
+    }, [isBusinessSetupSectionActive]);
 
     return (
         <>
@@ -87,27 +92,25 @@ export function NavMain() {
                 </SidebarGroup>
             )}
 
-            {(canViewUoms || canViewCategories) && (
+            {(canViewUoms || canViewCategories || canViewSuppliers) && (
                 <SidebarGroup className="px-2 py-0">
                     <Collapsible
-                        open={masterDataOpen}
-                        onOpenChange={setMasterDataOpen}
+                        open={businessSetupOpen}
+                        onOpenChange={setBusinessSetupOpen}
                         className="group/collapsible"
                     >
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <CollapsibleTrigger asChild>
                                     <SidebarMenuButton
-                                        tooltip="Master Data"
-                                        isActive={isMasterDataSectionActive}
+                                        tooltip="Business Setup"
+                                        isActive={isBusinessSetupSectionActive}
                                     >
                                         <Package />
-                                        <span>Master Data</span>
+                                        <span>Business Setup</span>
                                         <ChevronDown
                                             className={`ml-auto transition-transform duration-200 ${
-                                                masterDataOpen
-                                                    ? 'rotate-180'
-                                                    : ''
+                                                businessSetupOpen ? 'rotate-180' : ''
                                             }`}
                                         />
                                     </SidebarMenuButton>
@@ -142,6 +145,20 @@ export function NavMain() {
                                                 </SidebarMenuSubButton>
                                             </SidebarMenuSubItem>
                                         )}
+
+                                        {canViewSuppliers && (
+                                            <SidebarMenuSubItem>
+                                                <SidebarMenuSubButton
+                                                    asChild
+                                                    isActive={isSuppliersSectionActive}
+                                                >
+                                                    <Link href="/admin/suppliers" prefetch>
+                                                        <Truck />
+                                                        <span>Suppliers</span>
+                                                    </Link>
+                                                </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
+                                        )}
                                     </SidebarMenuSub>
                                 </CollapsibleContent>
                             </SidebarMenuItem>
@@ -168,9 +185,7 @@ export function NavMain() {
                                         <span>Administration</span>
                                         <ChevronDown
                                             className={`ml-auto transition-transform duration-200 ${
-                                                administrationOpen
-                                                    ? 'rotate-180'
-                                                    : ''
+                                                administrationOpen ? 'rotate-180' : ''
                                             }`}
                                         />
                                     </SidebarMenuButton>

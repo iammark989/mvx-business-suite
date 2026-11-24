@@ -89,11 +89,11 @@ class UserController extends Controller
      */
     public function edit(Request $request, User $user): Response
     {
-            // Only System Administrator can access identity-editing pages.
-        Gate::authorize('users.update-identity');
+        Gate::authorize('users.update-profile');
 
-        // Protect the reserved System Administrator account from editing.
         abort_if($user->hasRole('System Administrator'), 403);
+
+        $canUpdateIdentity = $request->user()->can('users.update-identity');
 
         $roles = Role::query()
             ->where('guard_name', 'web')
@@ -105,10 +105,12 @@ class UserController extends Controller
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
+                'position' => $user->position,
                 'email' => $user->email,
                 'is_active' => $user->is_active,
                 'role' => $user->roles->first()?->name ?? '',
             ],
+            'canUpdateIdentity' => $canUpdateIdentity,
             'roles' => $roles,
         ]);
     }
@@ -175,11 +177,11 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user): RedirectResponse
     {
-        // Only System Administrator can modify user identity information.
-        Gate::authorize('users.update-identity');
+        Gate::authorize('users.update-profile');
 
-        // Protect the reserved System Administrator account.
         abort_if($user->hasRole('System Administrator'), 403);
+
+        $canUpdateIdentity = $request->user()->can('users.update-identity');
 
         $assignableRoles = Role::query()
             ->where('guard_name', 'web')
@@ -187,33 +189,35 @@ class UserController extends Controller
             ->pluck('name')
             ->all();
 
-        $validated = $request->validate([
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'email' => [
+            'position' => ['nullable', 'string', 'max:100'],
+            'role' => ['required', 'string', Rule::in($assignableRoles)],
+        ];
+
+        if ($canUpdateIdentity) {
+            $rules['email'] = [
                 'required',
                 'string',
                 'lowercase',
                 'email',
                 'max:255',
                 Rule::unique('users', 'email')->ignore($user->id),
-            ],
-            'role' => [
-                'required',
-                'string',
-                Rule::in($assignableRoles),
-            ],
-        ]);
+            ];
+        }
 
-        // Reset email verification if the email address changes.
-        if ($user->email !== $validated['email']) {
+        $validated = $request->validate($rules);
+
+        $user->name = $validated['name'];
+        $user->position = $validated['position'] ?? null;
+
+        if ($canUpdateIdentity && $user->email !== $validated['email']) {
+            $user->email = $validated['email'];
             $user->email_verified_at = null;
         }
 
-        $user->name = $validated['name'];
-        $user->email = $validated['email'];
         $user->save();
 
-        // Ensure the user has exactly one assigned role.
         $user->syncRoles([$validated['role']]);
 
         return redirect()

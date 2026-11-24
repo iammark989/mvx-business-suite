@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 type UserRole = {
@@ -22,6 +22,12 @@ type PaginationLink = {
 };
 
 type PageProps = {
+    auth: {
+        user: {
+            id: number;
+        } | null;
+        permissions: string[];
+    };
     users: {
         data: User[];
         links: PaginationLink[];
@@ -35,9 +41,16 @@ type PageProps = {
     };
 };
 
-export default function Index({ users, filters }: PageProps) {
+export default function Index({ users, filters }: Omit<PageProps, 'auth'>) {
+    const { auth } = usePage<PageProps>().props;
+
     const [search, setSearch] = useState(filters.search);
     const [status, setStatus] = useState(filters.status);
+
+    const canCreate = auth.permissions.includes('users.create');
+    const canEdit = auth.permissions.includes('users.update-profile');
+    const canManageStatus = auth.permissions.includes('users.manage-status');
+    const isSystemAdministrator = auth.permissions.includes('users.update-identity');
 
     function applyFilters(
         nextSearch: string = search,
@@ -57,6 +70,25 @@ export default function Index({ users, filters }: PageProps) {
         );
     }
 
+    function toggleUserStatus(user: User) {
+        const nextStatus = !user.is_active;
+        const action = nextStatus ? 'activate' : 'deactivate';
+
+        if (!window.confirm(`Are you sure you want to ${action} ${user.name}'s account?`)) {
+            return;
+        }
+
+        router.patch(
+            `/admin/users/${user.id}/status`,
+            {
+                is_active: nextStatus,
+            },
+            {
+                preserveScroll: true,
+            },
+        );
+    }
+
     return (
         <>
             <Head title="User Management" />
@@ -72,12 +104,14 @@ export default function Index({ users, filters }: PageProps) {
                         </p>
                     </div>
 
-                    <Link
-                        href="/admin/users/create"
-                        className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-                    >
-                        + Create User
-                    </Link>
+                    {canCreate && (
+                        <Link
+                            href="/admin/users/create"
+                            className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
+                        >
+                            + Create User
+                        </Link>
+                    )}
                 </div>
 
                 <div className="rounded-xl border bg-card">
@@ -132,67 +166,117 @@ export default function Index({ users, filters }: PageProps) {
                             </thead>
 
                             <tbody className="divide-y">
-                                {users.data.map((user) => (
-                                    <tr key={user.id} className="hover:bg-muted/30">
-                                        <td className="whitespace-nowrap px-4 py-3 font-medium">
-                                            {user.name}
-                                        </td>
+                                {users.data.map((user) => {
+                                    const isProtected =
+                                        user.roles.some(
+                                            (role) => role.name === 'System Administrator',
+                                        );
 
-                                        <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
-                                            {user.email}
-                                        </td>
+                                    const isAdministrator =
+                                        user.roles.some(
+                                            (role) => role.name === 'Administrator',
+                                        );
 
-                                        <td className="px-4 py-3">
-                                            <div className="flex flex-wrap gap-1">
-                                                {user.roles.map((role) => (
-                                                    <span
-                                                        key={role.id}
-                                                        className="rounded-md bg-muted px-2 py-1 text-xs font-medium"
-                                                    >
-                                                        {role.name}
-                                                    </span>
-                                                ))}
+                                    const isSelf = auth.user?.id === user.id;
 
-                                                {user.roles.length === 0 && (
-                                                    <span className="text-muted-foreground">
-                                                        No role assigned
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </td>
+                                    const canChangeStatus =
+                                        canManageStatus &&
+                                        !isProtected &&
+                                        !isSelf &&
+                                        (isSystemAdministrator || !isAdministrator);
 
-                                        <td className="whitespace-nowrap px-4 py-3">
-                                            <span
-                                                className={
-                                                    user.is_active
-                                                        ? 'rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700'
-                                                        : 'rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700'
-                                                }
-                                            >
-                                                {user.is_active ? 'Active' : 'Inactive'}
-                                            </span>
-                                        </td>
+                                    return (
+                                        <tr key={user.id} className="hover:bg-muted/30">
+                                            <td className="whitespace-nowrap px-4 py-3 font-medium">
+                                                {user.name}
+                                            </td>
 
-                                        <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
-                                            {new Date(user.created_at).toLocaleDateString()}
-                                        </td>
+                                            <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                                                {user.email}
+                                            </td>
 
-                                        <td className="whitespace-nowrap px-4 py-3 text-right">
-                                            {user.roles.some((role) => role.name === 'System Administrator') ? (
-                                                <span className="text-xs text-muted-foreground">
-                                                    Protected
-                                                </span>
-                                            ) : (
-                                                <Link
-                                                    href={`/admin/users/${user.id}/edit`}
-                                                    className="font-medium text-primary hover:underline"
+                                            <td className="px-4 py-3">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {user.roles.map((role) => (
+                                                        <span
+                                                            key={role.id}
+                                                            className="rounded-md bg-muted px-2 py-1 text-xs font-medium"
+                                                        >
+                                                            {role.name}
+                                                        </span>
+                                                    ))}
+
+                                                    {user.roles.length === 0 && (
+                                                        <span className="text-muted-foreground">
+                                                            No role assigned
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+
+                                            <td className="whitespace-nowrap px-4 py-3">
+                                                <span
+                                                    className={
+                                                        user.is_active
+                                                            ? 'rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700'
+                                                            : 'rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700'
+                                                    }
                                                 >
-                                                    Edit
-                                                </Link>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
+                                                    {user.is_active ? 'Active' : 'Inactive'}
+                                                </span>
+                                            </td>
+
+                                            <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                                                {new Date(user.created_at).toLocaleDateString()}
+                                            </td>
+
+                                            <td className="whitespace-nowrap px-4 py-3 text-right">
+                                                {isProtected ? (
+                                                    <span className="text-xs text-muted-foreground">
+                                                        Protected
+                                                    </span>
+                                                ) : (
+                                                    <div className="flex items-center justify-end gap-3">
+                                                        {canEdit && (
+                                                            <Link
+                                                                href={`/admin/users/${user.id}/edit`}
+                                                                className="font-medium text-primary hover:underline"
+                                                            >
+                                                                Edit
+                                                            </Link>
+                                                        )}
+
+                                                        {canChangeStatus && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => toggleUserStatus(user)}
+                                                                className={
+                                                                    user.is_active
+                                                                        ? 'cursor-pointer font-medium text-red-600 hover:underline'
+                                                                        : 'cursor-pointer font-medium text-green-600 hover:underline'
+                                                                }
+                                                            >
+                                                                {user.is_active ? 'Deactivate' : 'Activate'}
+                                                            </button>
+                                                        )}
+
+                                                        {isSelf && (
+                                                            <span className="text-xs text-muted-foreground">
+                                                                Your account
+                                                            </span>
+                                                        )}
+
+                                                        {!canEdit && !canChangeStatus && !isSelf && (
+                                                            <span className="text-xs text-muted-foreground">
+                                                                View only
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
 
                                 {users.data.length === 0 && (
                                     <tr>

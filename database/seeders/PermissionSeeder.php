@@ -30,6 +30,7 @@ class PermissionSeeder extends Seeder
             'users.reset-password',
             'users.manage-status',
             'users.assign-roles',
+            'users.update-profile',
 
             // Roles and Permissions
             'roles.view',
@@ -150,6 +151,7 @@ class PermissionSeeder extends Seeder
                 'users.reset-password',
                 'users.manage-status',
                 'users.assign-roles',
+                'users.update-profile',
 
                 'items.view',
                 'items.create',
@@ -225,6 +227,7 @@ class PermissionSeeder extends Seeder
                 'uoms.create',
                 'uoms.update',
                 'uoms.manage-status',
+                'users.update-profile',
 
                 'categories.view',
                 'categories.create',
@@ -270,8 +273,10 @@ class PermissionSeeder extends Seeder
                 'reports.export',
 
                 'users.view',
+                'users.create',
                 'users.reset-password',
                 'users.manage-status',
+                'users.assign-roles',
             ],
 
             /*

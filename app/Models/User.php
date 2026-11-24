@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'profile_photo_path', 'is_active'])]
+#[Fillable(['name','position', 'email', 'password', 'profile_photo_path', 'is_active'])]
 #[Hidden([
     'password',
     'two_factor_secret',

@@ -124,7 +124,11 @@ export default function Index({ categories, filters }: PageProps) {
                     <button
                         type="button"
                         onClick={() => toggleStatus(category)}
-                        className="cursor-pointer font-medium text-muted-foreground hover:text-foreground"
+                        className={
+                            category.is_active
+                                  ? 'cursor-pointer font-medium text-red-600 hover:underline'
+                                  : 'cursor-pointer font-medium text-green-600 hover:underline'
+                                   }
                     >
                         {category.is_active ? 'Deactivate' : 'Activate'}
                     </button>

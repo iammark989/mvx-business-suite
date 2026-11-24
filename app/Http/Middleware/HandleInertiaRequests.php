@@ -77,7 +77,17 @@ class HandleInertiaRequests extends Middleware
                         'items.view',
                         'warehouses.view',
                         'inventory.view',
+                        
+                        // User Management
                         'users.view',
+                        'users.create',
+                        'users.update-profile',
+                        'users.update-identity',
+                        'users.reset-password',
+                        'users.manage-status',
+                        'users.assign-roles',
+
+                        // Roles
                         'roles.view',
                         'settings.view',
                     ])->filter(fn ($permission) => Gate::forUser($request->user())->allows($permission))

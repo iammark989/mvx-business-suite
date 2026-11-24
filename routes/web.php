@@ -54,11 +54,11 @@ Route::middleware(['auth', 'verified'])
                 ->name('users.store');
 
             Route::get('/users/{user}/edit', [UserController::class, 'edit'])
-                ->middleware('can:users.update-identity')
+                ->middleware('can:users.update-profile')
                 ->name('users.edit');
 
             Route::put('/users/{user}', [UserController::class, 'update'])
-                ->middleware('can:users.update-identity')
+                ->middleware('can:users.update-profile')
                 ->name('users.update');
             
             Route::put('/users/{user}/password', [UserController::class, 'resetPassword'])

@@ -68,6 +68,7 @@ class PermissionSeeder extends Seeder
             'suppliers.view',
             'suppliers.create',
             'suppliers.update',
+            'suppliers.manage-status',
 
             // Warehouses
             'warehouses.view',
@@ -174,6 +175,7 @@ class PermissionSeeder extends Seeder
                 'suppliers.view',
                 'suppliers.create',
                 'suppliers.update',
+                'suppliers.manage-status',
 
                 'warehouses.view',
                 'warehouses.manage',
@@ -239,6 +241,7 @@ class PermissionSeeder extends Seeder
                 'suppliers.view',
                 'suppliers.create',
                 'suppliers.update',
+                'suppliers.manage-status',
 
                 'warehouses.view',
                 'warehouses.manage',
@@ -311,6 +314,7 @@ class PermissionSeeder extends Seeder
                 'items.view',
                 'uoms.view',
                 'categories.view',
+                'suppliers.view',
                 'customers.view',
                 'customers.create',
                 'customers.update',
@@ -367,6 +371,7 @@ class PermissionSeeder extends Seeder
                 'suppliers.view',
                 'suppliers.create',
                 'suppliers.update',
+                'suppliers.manage-status',
 
                 'warehouses.view',
 

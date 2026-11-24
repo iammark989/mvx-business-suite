@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UomController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Settings\ProfileController;
@@ -116,6 +117,31 @@ Route::middleware(['auth', 'verified'])
 
             Route::patch('/categories/{category}/status', [CategoryController::class, 'updateStatus'])
                 ->middleware('can:categories.manage-status')
-                ->name('categories.update-status');    
+                ->name('categories.update-status');   
+                
+            // Supplier Management
+            Route::get('/suppliers', [SupplierController::class, 'index'])
+                ->middleware('can:suppliers.view')
+                ->name('suppliers.index');
+
+            Route::get('/suppliers/create', [SupplierController::class, 'create'])
+                ->middleware('can:suppliers.create')
+                ->name('suppliers.create');
+
+            Route::post('/suppliers', [SupplierController::class, 'store'])
+                ->middleware('can:suppliers.create')
+                ->name('suppliers.store');
+
+            Route::get('/suppliers/{supplier}/edit', [SupplierController::class, 'edit'])
+                ->middleware('can:suppliers.update')
+                ->name('suppliers.edit');
+
+            Route::put('/suppliers/{supplier}', [SupplierController::class, 'update'])
+                ->middleware('can:suppliers.update')
+                ->name('suppliers.update');
+
+            Route::patch('/suppliers/{supplier}/status', [SupplierController::class, 'updateStatus'])
+                ->middleware('can:suppliers.manage-status')
+                ->name('suppliers.update-status');    
 
     });

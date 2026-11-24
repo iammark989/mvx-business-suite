@@ -233,7 +233,7 @@ export default function Edit({ category, parentCategories }: PageProps) {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="cursor-pointer inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             {processing ? 'Saving...' : 'Save Changes'}
                         </button>

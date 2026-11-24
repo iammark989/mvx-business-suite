@@ -66,6 +66,12 @@ class HandleInertiaRequests extends Middleware
                         'categories.update',
                         'categories.manage-status',
 
+                        // Suppliers
+                        'suppliers.view',
+                        'suppliers.create',
+                        'suppliers.update',
+                        'suppliers.manage-status',
+
                         'purchase-orders.view',
                         'goods-receipts.view',
                         'items.view',

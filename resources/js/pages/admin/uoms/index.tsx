@@ -201,7 +201,7 @@ export default function Index({ uoms, filters }: PageProps) {
                                                     <button
                                                         type="button"
                                                         onClick={() => toggleStatus(uom)}
-                                                        className="font-medium text-muted-foreground hover:text-foreground"
+                                                        className="cursor-pointer font-medium text-muted-foreground hover:text-foreground"
                                                     >
                                                         {uom.is_active ? 'Deactivate' : 'Activate'}
                                                     </button>

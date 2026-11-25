@@ -73,7 +73,10 @@ class PermissionSeeder extends Seeder
 
             // Warehouses
             'warehouses.view',
-            'warehouses.manage',
+            'warehouses.create',
+            'warehouses.update',
+            'warehouses.manage-status',
+            'warehouses.assign-users',
 
             // Purchase Orders
             'purchase-orders.view',
@@ -180,7 +183,10 @@ class PermissionSeeder extends Seeder
                 'suppliers.manage-status',
 
                 'warehouses.view',
-                'warehouses.manage',
+                'warehouses.create',
+                'warehouses.update',
+                'warehouses.manage-status',
+                'warehouses.assign-users',
 
                 'purchase-orders.view',
                 'purchase-orders.create',
@@ -247,7 +253,10 @@ class PermissionSeeder extends Seeder
                 'suppliers.manage-status',
 
                 'warehouses.view',
-                'warehouses.manage',
+                'warehouses.create',
+                'warehouses.update',
+                'warehouses.manage-status',
+                'warehouses.assign-users',
 
                 'purchase-orders.view',
                 'purchase-orders.create',

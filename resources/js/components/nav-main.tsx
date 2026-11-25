@@ -9,6 +9,8 @@ import {
     Tags,
     Truck,
     Users,
+    Warehouse,
+    SlidersHorizontal,
 } from 'lucide-react';
 
 import {
@@ -35,21 +37,37 @@ export function NavMain() {
     const { auth } = usePage().props;
     const { isCurrentUrl, isCurrentOrParentUrl } = useCurrentUrl();
 
+    // Dashboard
     const canViewDashboard = auth.permissions.includes('dashboard.view');
-    const canViewUsers = auth.permissions.includes('users.view');
+
+    // Inventory
+    const canViewWarehouses = auth.permissions.includes('warehouses.view');
+
+    // Business Setup
     const canViewUoms = auth.permissions.includes('uoms.view');
     const canViewCategories = auth.permissions.includes('categories.view');
     const canViewSuppliers = auth.permissions.includes('suppliers.view');
 
+    // Administration
+    const canViewUsers = auth.permissions.includes('users.view');
+
+    // Active navigation states
     const isUsersSectionActive = isCurrentOrParentUrl(users.index());
+    const isWarehousesSectionActive = isCurrentOrParentUrl('/admin/warehouses');
     const isUomsSectionActive = isCurrentOrParentUrl('/admin/uoms');
     const isCategoriesSectionActive = isCurrentOrParentUrl('/admin/categories');
     const isSuppliersSectionActive = isCurrentOrParentUrl('/admin/suppliers');
+
+    const isInventorySectionActive = isWarehousesSectionActive;
 
     const isBusinessSetupSectionActive =
         isUomsSectionActive ||
         isCategoriesSectionActive ||
         isSuppliersSectionActive;
+
+    const [inventoryOpen, setInventoryOpen] = useState(
+        isInventorySectionActive,
+    );
 
     const [administrationOpen, setAdministrationOpen] = useState(
         isUsersSectionActive,
@@ -58,6 +76,12 @@ export function NavMain() {
     const [businessSetupOpen, setBusinessSetupOpen] = useState(
         isBusinessSetupSectionActive,
     );
+
+    useEffect(() => {
+        if (isInventorySectionActive) {
+            setInventoryOpen(true);
+        }
+    }, [isInventorySectionActive]);
 
     useEffect(() => {
         if (isUsersSectionActive) {
@@ -73,6 +97,7 @@ export function NavMain() {
 
     return (
         <>
+            {/* Dashboard */}
             {canViewDashboard && (
                 <SidebarGroup className="px-2 py-0">
                     <SidebarMenu>
@@ -92,6 +117,62 @@ export function NavMain() {
                 </SidebarGroup>
             )}
 
+            {/* Item Master */}
+            {/* Will be added when Item Master permissions and routes are implemented. */}
+
+            {/* Inventory */}
+            {canViewWarehouses && (
+                <SidebarGroup className="px-2 py-0">
+                    <Collapsible
+                        open={inventoryOpen}
+                        onOpenChange={setInventoryOpen}
+                        className="group/collapsible"
+                    >
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <CollapsibleTrigger asChild>
+                                    <SidebarMenuButton
+                                        tooltip="Inventory"
+                                        isActive={isInventorySectionActive}
+                                    >
+                                        <Warehouse />
+                                        <span>Inventory</span>
+                                        <ChevronDown
+                                            className={`ml-auto transition-transform duration-200 ${
+                                                inventoryOpen ? 'rotate-180' : ''
+                                            }`}
+                                        />
+                                    </SidebarMenuButton>
+                                </CollapsibleTrigger>
+
+                                <CollapsibleContent>
+                                    <SidebarMenuSub>
+                                        <SidebarMenuSubItem>
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={isWarehousesSectionActive}
+                                            >
+                                                <Link
+                                                    href="/admin/warehouses"
+                                                    prefetch
+                                                >
+                                                    <Warehouse />
+                                                    <span>Warehouse Management</span>
+                                                </Link>
+                                            </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
+                                    </SidebarMenuSub>
+                                </CollapsibleContent>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </Collapsible>
+                </SidebarGroup>
+            )}
+
+            {/* Purchasing */}
+            {/* Purchase Orders and Goods Receipts will be added when implemented. */}
+
+            {/* Business Setup */}
             {(canViewUoms || canViewCategories || canViewSuppliers) && (
                 <SidebarGroup className="px-2 py-0">
                     <Collapsible
@@ -106,11 +187,13 @@ export function NavMain() {
                                         tooltip="Business Setup"
                                         isActive={isBusinessSetupSectionActive}
                                     >
-                                        <Package />
+                                        <SlidersHorizontal />
                                         <span>Business Setup</span>
                                         <ChevronDown
                                             className={`ml-auto transition-transform duration-200 ${
-                                                businessSetupOpen ? 'rotate-180' : ''
+                                                businessSetupOpen
+                                                    ? 'rotate-180'
+                                                    : ''
                                             }`}
                                         />
                                     </SidebarMenuButton>
@@ -138,7 +221,10 @@ export function NavMain() {
                                                     asChild
                                                     isActive={isCategoriesSectionActive}
                                                 >
-                                                    <Link href="/admin/categories" prefetch>
+                                                    <Link
+                                                        href="/admin/categories"
+                                                        prefetch
+                                                    >
                                                         <Tags />
                                                         <span>Categories</span>
                                                     </Link>
@@ -152,7 +238,10 @@ export function NavMain() {
                                                     asChild
                                                     isActive={isSuppliersSectionActive}
                                                 >
-                                                    <Link href="/admin/suppliers" prefetch>
+                                                    <Link
+                                                        href="/admin/suppliers"
+                                                        prefetch
+                                                    >
                                                         <Truck />
                                                         <span>Suppliers</span>
                                                     </Link>
@@ -167,6 +256,7 @@ export function NavMain() {
                 </SidebarGroup>
             )}
 
+            {/* Administration */}
             {canViewUsers && (
                 <SidebarGroup className="px-2 py-0">
                     <Collapsible
@@ -185,7 +275,9 @@ export function NavMain() {
                                         <span>Administration</span>
                                         <ChevronDown
                                             className={`ml-auto transition-transform duration-200 ${
-                                                administrationOpen ? 'rotate-180' : ''
+                                                administrationOpen
+                                                    ? 'rotate-180'
+                                                    : ''
                                             }`}
                                         />
                                     </SidebarMenuButton>

@@ -4,14 +4,15 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UomController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\WarehouseController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+ Route::get('/', function () {
+                return Inertia::render('home');
+            })->name('home');
 
 Route::middleware(['auth', 'verified'])
     ->prefix('admin')
@@ -21,6 +22,8 @@ Route::middleware(['auth', 'verified'])
         })
             ->middleware('can:dashboard.view')
             ->name('dashboard');
+
+           
 
         Route::prefix('settings')->group(function () {
             Route::get('/profile', [ProfileController::class, 'edit'])
@@ -144,4 +147,36 @@ Route::middleware(['auth', 'verified'])
                 ->middleware('can:suppliers.manage-status')
                 ->name('suppliers.update-status');    
 
+            // Warehouse Management
+            Route::get('/warehouses', [WarehouseController::class, 'index'])
+                ->middleware('can:warehouses.view')
+                ->name('warehouses.index');
+
+            Route::get('/warehouses/create', [WarehouseController::class, 'create'])
+                ->middleware('can:warehouses.create')
+                ->name('warehouses.create');
+
+            Route::post('/warehouses', [WarehouseController::class, 'store'])
+                ->middleware('can:warehouses.create')
+                ->name('warehouses.store');
+
+            Route::get('/warehouses/{warehouse}/edit', [WarehouseController::class, 'edit'])
+                ->middleware('can:warehouses.update')
+                ->name('warehouses.edit');
+
+            Route::put('/warehouses/{warehouse}', [WarehouseController::class, 'update'])
+                ->middleware('can:warehouses.update')
+                ->name('warehouses.update');
+
+            Route::patch('/warehouses/{warehouse}/status', [WarehouseController::class, 'updateStatus'])
+                ->middleware('can:warehouses.manage-status')
+                ->name('warehouses.update-status');
+
+            Route::put('/warehouses/{warehouse}/users', [WarehouseController::class, 'assignUsers'])
+                ->middleware('can:warehouses.assign-users')
+                ->name('warehouses.assign-users');
+                
+            Route::get('/warehouses/{warehouse}/users', [WarehouseController::class, 'editUsers'])
+                ->middleware('can:warehouses.assign-users')
+                ->name('warehouses.users');    
     });

@@ -47,7 +47,8 @@ export function NavMain() {
     const canViewUoms = auth.permissions.includes('uoms.view');
     const canViewCategories = auth.permissions.includes('categories.view');
     const canViewSuppliers = auth.permissions.includes('suppliers.view');
-
+    const canViewBrands = auth.permissions.includes('brands.view');
+    
     // Administration
     const canViewUsers = auth.permissions.includes('users.view');
 
@@ -57,12 +58,14 @@ export function NavMain() {
     const isUomsSectionActive = isCurrentOrParentUrl('/admin/uoms');
     const isCategoriesSectionActive = isCurrentOrParentUrl('/admin/categories');
     const isSuppliersSectionActive = isCurrentOrParentUrl('/admin/suppliers');
+    const isBrandsSectionActive = isCurrentOrParentUrl('/admin/brands');
 
     const isInventorySectionActive = isWarehousesSectionActive;
 
     const isBusinessSetupSectionActive =
         isUomsSectionActive ||
         isCategoriesSectionActive ||
+        isBrandsSectionActive ||
         isSuppliersSectionActive;
 
     const [inventoryOpen, setInventoryOpen] = useState(
@@ -173,7 +176,7 @@ export function NavMain() {
             {/* Purchase Orders and Goods Receipts will be added when implemented. */}
 
             {/* Business Setup */}
-            {(canViewUoms || canViewCategories || canViewSuppliers) && (
+            {(canViewUoms || canViewCategories || canViewBrands || canViewSuppliers) && (
                 <SidebarGroup className="px-2 py-0">
                     <Collapsible
                         open={businessSetupOpen}
@@ -227,6 +230,20 @@ export function NavMain() {
                                                     >
                                                         <Tags />
                                                         <span>Categories</span>
+                                                    </Link>
+                                                </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
+                                        )}
+
+                                        {canViewBrands && (
+                                            <SidebarMenuSubItem>
+                                                <SidebarMenuSubButton
+                                                    asChild
+                                                    isActive={isBrandsSectionActive}
+                                                >
+                                                    <Link href="/admin/brands" prefetch>
+                                                        <Tags />
+                                                        <span>Brand Master</span>
                                                     </Link>
                                                 </SidebarMenuSubButton>
                                             </SidebarMenuSubItem>

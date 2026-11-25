@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UomController;
@@ -178,5 +179,30 @@ Route::middleware(['auth', 'verified'])
                 
             Route::get('/warehouses/{warehouse}/users', [WarehouseController::class, 'editUsers'])
                 ->middleware('can:warehouses.assign-users')
-                ->name('warehouses.users');    
+                ->name('warehouses.users');
+                
+                        // Brand Management
+            Route::get('/brands', [BrandController::class, 'index'])
+                ->middleware('can:brands.view')
+                ->name('brands.index');
+
+            Route::get('/brands/create', [BrandController::class, 'create'])
+                ->middleware('can:brands.create')
+                ->name('brands.create');
+
+            Route::post('/brands', [BrandController::class, 'store'])
+                ->middleware('can:brands.create')
+                ->name('brands.store');
+
+            Route::get('/brands/{brand}/edit', [BrandController::class, 'edit'])
+                ->middleware('can:brands.update')
+                ->name('brands.edit');
+
+            Route::put('/brands/{brand}', [BrandController::class, 'update'])
+                ->middleware('can:brands.update')
+                ->name('brands.update');
+
+            Route::patch('/brands/{brand}/status', [BrandController::class, 'updateStatus'])
+                ->middleware('can:brands.manage-status')
+                ->name('brands.update-status');    
     });

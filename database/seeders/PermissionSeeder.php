@@ -58,7 +58,9 @@ class PermissionSeeder extends Seeder
 
             // Brands
             'brands.view',
-            'brands.manage',
+            'brands.create',
+            'brands.update',
+            'brands.manage-status',
 
             // Customers
             'customers.view',
@@ -171,7 +173,9 @@ class PermissionSeeder extends Seeder
                 'categories.manage-status',
 
                 'brands.view',
-                'brands.manage',
+                'brands.create',
+                'brands.update',
+                'brands.manage-status',
 
                 'customers.view',
                 'customers.create',
@@ -241,7 +245,9 @@ class PermissionSeeder extends Seeder
                 'categories.manage-status',
 
                 'brands.view',
-                'brands.manage',
+                'brands.create',
+                'brands.update',
+                'brands.manage-status',
 
                 'customers.view',
                 'customers.create',
@@ -300,6 +306,7 @@ class PermissionSeeder extends Seeder
                 'items.view',
                 'uoms.view',
                 'categories.view',
+                'brands.view',
                 'customers.view',
                 'suppliers.view',
                 'warehouses.view',
@@ -329,6 +336,7 @@ class PermissionSeeder extends Seeder
                 'uoms.view',
                 'categories.view',
                 'suppliers.view',
+                'brands.view',
                 'customers.view',
                 'customers.create',
                 'customers.update',
@@ -358,6 +366,7 @@ class PermissionSeeder extends Seeder
                 'categories.view',
                 'suppliers.view',
                 'warehouses.view',
+                'brands.view',
 
                 'goods-receipts.view',
                 'goods-receipts.create',
@@ -388,6 +397,11 @@ class PermissionSeeder extends Seeder
                 'suppliers.manage-status',
 
                 'warehouses.view',
+
+                'brands.view',
+                'brands.create',
+                'brands.update',
+                'brands.manage-status',
 
                 'purchase-orders.view',
                 'purchase-orders.create',

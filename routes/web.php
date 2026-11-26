@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PriceTypeController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\TaxConfigurationController;
 use App\Http\Controllers\Admin\UomController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WarehouseController;
@@ -231,4 +232,30 @@ Route::middleware(['auth', 'verified'])
             Route::patch('/price-types/{priceType}/status', [PriceTypeController::class, 'updateStatus'])
                 ->middleware('can:price-types.manage-status')
                 ->name('price-types.update-status');
+
+        // Tax Configuration Management
+        Route::get('/tax-configurations', [TaxConfigurationController::class, 'index'])
+            ->middleware('can:tax-configurations.view')
+            ->name('tax-configurations.index');
+
+        Route::get('/tax-configurations/create', [TaxConfigurationController::class, 'create'])
+            ->middleware('can:tax-configurations.create')
+            ->name('tax-configurations.create');
+
+        Route::post('/tax-configurations', [TaxConfigurationController::class, 'store'])
+            ->middleware('can:tax-configurations.create')
+            ->name('tax-configurations.store');
+
+        Route::get('/tax-configurations/{taxConfiguration}/edit', [TaxConfigurationController::class, 'edit'])
+            ->middleware('can:tax-configurations.update')
+            ->name('tax-configurations.edit');
+
+        Route::put('/tax-configurations/{taxConfiguration}', [TaxConfigurationController::class, 'update'])
+            ->middleware('can:tax-configurations.update')
+            ->name('tax-configurations.update');
+
+        Route::patch('/tax-configurations/{taxConfiguration}/status', [TaxConfigurationController::class, 'updateStatus'])
+            ->middleware('can:tax-configurations.manage-status')
+            ->name('tax-configurations.update-status');
+    
     });

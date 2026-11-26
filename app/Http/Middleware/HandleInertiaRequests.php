@@ -84,6 +84,12 @@ class HandleInertiaRequests extends Middleware
                         'price-types.update',
                         'price-types.manage-status',
 
+                        // Tax Configuration
+                        'tax-configurations.view',
+                        'tax-configurations.create',
+                        'tax-configurations.update',
+                        'tax-configurations.manage-status',
+
                         'purchase-orders.view',
                         'goods-receipts.view',
                         'items.view',

@@ -73,6 +73,12 @@ class PermissionSeeder extends Seeder
             'suppliers.update',
             'suppliers.manage-status',
 
+            // Tax Configuration
+            'tax-configurations.view',
+            'tax-configurations.create',
+            'tax-configurations.update',
+            'tax-configurations.manage-status',
+
             // Warehouses
             'warehouses.view',
             'warehouses.create',
@@ -188,6 +194,11 @@ class PermissionSeeder extends Seeder
                 'price-types.update',
                 'price-types.manage-status',
 
+                'tax-configurations.view',
+                'tax-configurations.create',
+                'tax-configurations.update',
+                'tax-configurations.manage-status',
+
                 'customers.view',
                 'customers.create',
                 'customers.update',
@@ -260,6 +271,11 @@ class PermissionSeeder extends Seeder
                 'price-types.update',
                 'price-types.manage-status',
 
+                'tax-configurations.view',
+                'tax-configurations.create',
+                'tax-configurations.update',
+                'tax-configurations.manage-status',
+
                 'brands.view',
                 'brands.create',
                 'brands.update',
@@ -328,6 +344,11 @@ class PermissionSeeder extends Seeder
                 'warehouses.view',
                 'price-types.view',
 
+                'tax-configurations.view',
+                'tax-configurations.create',
+                'tax-configurations.update',
+                'tax-configurations.manage-status',
+
                 'purchase-orders.view',
                 'goods-receipts.view',
                 'inventory.view',
@@ -358,6 +379,7 @@ class PermissionSeeder extends Seeder
                 'customers.create',
                 'customers.update',
                 'price-types.view',
+                'tax-configurations.view',
 
                 'warehouses.view',
                 'inventory.view',
@@ -413,6 +435,7 @@ class PermissionSeeder extends Seeder
                 'suppliers.create',
                 'suppliers.update',
                 'suppliers.manage-status',
+                'tax-configurations.view',
 
                 'warehouses.view',
 

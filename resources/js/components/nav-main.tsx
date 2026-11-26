@@ -3,6 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     ChevronDown,
     LayoutGrid,
+    DollarSign,
     Package,
     Ruler,
     ShieldCheck,
@@ -48,6 +49,8 @@ export function NavMain() {
     const canViewCategories = auth.permissions.includes('categories.view');
     const canViewSuppliers = auth.permissions.includes('suppliers.view');
     const canViewBrands = auth.permissions.includes('brands.view');
+    const canViewPriceTypes = auth.permissions.includes('price-types.view');
+    const canViewTaxConfigurations = auth.permissions.includes('tax-configurations.view',);
     
     // Administration
     const canViewUsers = auth.permissions.includes('users.view');
@@ -59,6 +62,8 @@ export function NavMain() {
     const isCategoriesSectionActive = isCurrentOrParentUrl('/admin/categories');
     const isSuppliersSectionActive = isCurrentOrParentUrl('/admin/suppliers');
     const isBrandsSectionActive = isCurrentOrParentUrl('/admin/brands');
+    const isPriceTypesSectionActive = isCurrentOrParentUrl('/admin/price-types');
+    const isTaxConfigurationsSectionActive = isCurrentOrParentUrl('/admin/tax-configurations',);
 
     const isInventorySectionActive = isWarehousesSectionActive;
 
@@ -66,7 +71,9 @@ export function NavMain() {
         isUomsSectionActive ||
         isCategoriesSectionActive ||
         isBrandsSectionActive ||
-        isSuppliersSectionActive;
+        isSuppliersSectionActive ||
+        isPriceTypesSectionActive ||
+        isTaxConfigurationsSectionActive;
 
     const [inventoryOpen, setInventoryOpen] = useState(
         isInventorySectionActive,
@@ -176,7 +183,12 @@ export function NavMain() {
             {/* Purchase Orders and Goods Receipts will be added when implemented. */}
 
             {/* Business Setup */}
-            {(canViewUoms || canViewCategories || canViewBrands || canViewSuppliers) && (
+            {(canViewUoms ||
+                canViewCategories ||
+                canViewBrands ||
+                canViewSuppliers ||
+                canViewPriceTypes ||
+                canViewTaxConfigurations) && (
                 <SidebarGroup className="px-2 py-0">
                     <Collapsible
                         open={businessSetupOpen}
@@ -261,6 +273,34 @@ export function NavMain() {
                                                     >
                                                         <Truck />
                                                         <span>Suppliers</span>
+                                                    </Link>
+                                                </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
+                                        )}
+
+                                        {canViewPriceTypes && (
+                                            <SidebarMenuSubItem>
+                                                <SidebarMenuSubButton
+                                                    asChild
+                                                    isActive={isPriceTypesSectionActive}
+                                                >
+                                                    <Link href="/admin/price-types" prefetch>
+                                                        <DollarSign />
+                                                        <span>Price Type Management</span>
+                                                    </Link>
+                                                </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
+                                        )}
+
+                                        {canViewTaxConfigurations && (
+                                            <SidebarMenuSubItem>
+                                                <SidebarMenuSubButton
+                                                    asChild
+                                                    isActive={isTaxConfigurationsSectionActive}
+                                                >
+                                                    <Link href="/admin/tax-configurations" prefetch>
+                                                        <SlidersHorizontal />
+                                                        <span>Tax Configuration</span>
                                                     </Link>
                                                 </SidebarMenuSubButton>
                                             </SidebarMenuSubItem>

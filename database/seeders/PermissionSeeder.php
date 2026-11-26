@@ -86,6 +86,12 @@ class PermissionSeeder extends Seeder
             'purchase-orders.update',
             'purchase-orders.submit',
 
+            // Price
+            'price-types.view',
+            'price-types.create',
+            'price-types.update',
+            'price-types.manage-status',
+
             // Goods Receipts
             'goods-receipts.view',
             'goods-receipts.create',
@@ -177,6 +183,11 @@ class PermissionSeeder extends Seeder
                 'brands.update',
                 'brands.manage-status',
 
+                'price-types.view',
+                'price-types.create',
+                'price-types.update',
+                'price-types.manage-status',
+
                 'customers.view',
                 'customers.create',
                 'customers.update',
@@ -244,6 +255,11 @@ class PermissionSeeder extends Seeder
                 'categories.update',
                 'categories.manage-status',
 
+                'price-types.view',
+                'price-types.create',
+                'price-types.update',
+                'price-types.manage-status',
+
                 'brands.view',
                 'brands.create',
                 'brands.update',
@@ -310,6 +326,7 @@ class PermissionSeeder extends Seeder
                 'customers.view',
                 'suppliers.view',
                 'warehouses.view',
+                'price-types.view',
 
                 'purchase-orders.view',
                 'goods-receipts.view',
@@ -340,6 +357,7 @@ class PermissionSeeder extends Seeder
                 'customers.view',
                 'customers.create',
                 'customers.update',
+                'price-types.view',
 
                 'warehouses.view',
                 'inventory.view',

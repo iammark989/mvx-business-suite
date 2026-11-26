@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\PriceTypeController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UomController;
 use App\Http\Controllers\Admin\UserController;
@@ -204,5 +205,30 @@ Route::middleware(['auth', 'verified'])
 
             Route::patch('/brands/{brand}/status', [BrandController::class, 'updateStatus'])
                 ->middleware('can:brands.manage-status')
-                ->name('brands.update-status');    
+                ->name('brands.update-status'); 
+                
+            // Price Type Management
+            Route::get('/price-types', [PriceTypeController::class, 'index'])
+                ->middleware('can:price-types.view')
+                ->name('price-types.index');
+
+            Route::get('/price-types/create', [PriceTypeController::class, 'create'])
+                ->middleware('can:price-types.create')
+                ->name('price-types.create');
+
+            Route::post('/price-types', [PriceTypeController::class, 'store'])
+                ->middleware('can:price-types.create')
+                ->name('price-types.store');
+
+            Route::get('/price-types/{priceType}/edit', [PriceTypeController::class, 'edit'])
+                ->middleware('can:price-types.update')
+                ->name('price-types.edit');
+
+            Route::put('/price-types/{priceType}', [PriceTypeController::class, 'update'])
+                ->middleware('can:price-types.update')
+                ->name('price-types.update');
+
+            Route::patch('/price-types/{priceType}/status', [PriceTypeController::class, 'updateStatus'])
+                ->middleware('can:price-types.manage-status')
+                ->name('price-types.update-status');
     });

@@ -78,6 +78,12 @@ class HandleInertiaRequests extends Middleware
                         'brands.update',
                         'brands.manage-status',
 
+                        // Price
+                        'price-types.view',
+                        'price-types.create',
+                        'price-types.update',
+                        'price-types.manage-status',
+
                         'purchase-orders.view',
                         'goods-receipts.view',
                         'items.view',

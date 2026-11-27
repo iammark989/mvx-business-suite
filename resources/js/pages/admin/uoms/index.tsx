@@ -5,6 +5,7 @@ type Uom = {
     id: number;
     code: string;
     name: string;
+    measurement_type: string;
     description: string | null;
     is_active: boolean;
     created_at: string;
@@ -79,6 +80,10 @@ export default function Index({ uoms, filters }: PageProps) {
         );
     }
 
+    function formatMeasurementType(type: string) {
+        return type.charAt(0).toUpperCase() + type.slice(1);
+    }
+
     return (
         <>
             <Head title="Unit of Measure" />
@@ -148,6 +153,7 @@ export default function Index({ uoms, filters }: PageProps) {
                                 <tr>
                                     <th className="px-4 py-3 font-medium">Code</th>
                                     <th className="px-4 py-3 font-medium">Name</th>
+                                    <th className="px-4 py-3 font-medium">Measurement Type</th>
                                     <th className="px-4 py-3 font-medium">Description</th>
                                     <th className="px-4 py-3 font-medium">Status</th>
                                     <th className="px-4 py-3 font-medium">Created</th>
@@ -164,6 +170,12 @@ export default function Index({ uoms, filters }: PageProps) {
 
                                         <td className="whitespace-nowrap px-4 py-3">
                                             {uom.name}
+                                        </td>
+
+                                        <td className="whitespace-nowrap px-4 py-3">
+                                            <span className="rounded-full bg-sky-100 px-2.5 py-1 text-xs font-medium text-sky-700">
+                                                {formatMeasurementType(uom.measurement_type)}
+                                            </span>
                                         </td>
 
                                         <td className="px-4 py-3 text-muted-foreground">
@@ -202,10 +214,10 @@ export default function Index({ uoms, filters }: PageProps) {
                                                         type="button"
                                                         onClick={() => toggleStatus(uom)}
                                                         className={
-                                                                    uom.is_active
-                                                                        ? 'cursor-pointer font-medium text-red-600 hover:underline'
-                                                                        : 'cursor-pointer font-medium text-green-600 hover:underline'
-                                                                }
+                                                            uom.is_active
+                                                                ? 'cursor-pointer font-medium text-red-600 hover:underline'
+                                                                : 'cursor-pointer font-medium text-green-600 hover:underline'
+                                                        }
                                                     >
                                                         {uom.is_active ? 'Deactivate' : 'Activate'}
                                                     </button>
@@ -224,7 +236,7 @@ export default function Index({ uoms, filters }: PageProps) {
                                 {uoms.data.length === 0 && (
                                     <tr>
                                         <td
-                                            colSpan={6}
+                                            colSpan={7}
                                             className="px-4 py-10 text-center text-muted-foreground"
                                         >
                                             No units of measure found.

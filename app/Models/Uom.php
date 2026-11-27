@@ -9,6 +9,7 @@ class Uom extends Model
     protected $fillable = [
         'code',
         'name',
+        'measurement_type',
         'description',
         'is_active',
     ];

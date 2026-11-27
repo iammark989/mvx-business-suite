@@ -5,6 +5,7 @@ type Uom = {
     id: number;
     code: string;
     name: string;
+    measurement_type: string;
     description: string | null;
     is_active: boolean;
 };
@@ -17,6 +18,7 @@ export default function Edit({ uom }: PageProps) {
     const { data, setData, put, processing, errors } = useForm({
         code: uom.code,
         name: uom.name,
+        measurement_type: uom.measurement_type,
         description: uom.description ?? '',
     });
 
@@ -105,6 +107,41 @@ export default function Edit({ uom }: PageProps) {
                                         {errors.name}
                                     </p>
                                 )}
+                            </div>
+
+                            <div>
+                                <label
+                                    htmlFor="measurement_type"
+                                    className="mb-2 block text-sm font-medium"
+                                >
+                                    Measurement Type
+                                </label>
+
+                                <select
+                                    id="measurement_type"
+                                    value={data.measurement_type}
+                                    onChange={(event) =>
+                                        setData('measurement_type', event.target.value)
+                                    }
+                                    required
+                                    className="h-10 w-full rounded-md border bg-background px-3 text-sm outline-none focus:border-primary"
+                                >
+                                    <option value="quantity">Quantity</option>
+                                    <option value="weight">Weight</option>
+                                    <option value="volume">Volume</option>
+                                    <option value="length">Length</option>
+                                    <option value="area">Area</option>
+                                </select>
+
+                                {errors.measurement_type && (
+                                    <p className="mt-1 text-sm text-destructive">
+                                        {errors.measurement_type}
+                                    </p>
+                                )}
+
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                    Changing the measurement type is restricted when this UOM is already assigned to an item.
+                                </p>
                             </div>
 
                             <div>

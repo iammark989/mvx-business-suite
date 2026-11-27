@@ -43,6 +43,8 @@ class PermissionSeeder extends Seeder
             'items.view',
             'items.create',
             'items.update',
+            'items.manage-prices',
+            'items.manage-status',
 
             // Units of Measure
             'uoms.view',
@@ -173,6 +175,8 @@ class PermissionSeeder extends Seeder
                 'items.view',
                 'items.create',
                 'items.update',
+                'items.manage-prices',
+                'items.manage-status',
 
                 'uoms.view',
                 'uoms.create',
@@ -254,6 +258,8 @@ class PermissionSeeder extends Seeder
                 'items.view',
                 'items.create',
                 'items.update',
+                'items.manage-prices',
+                'items.manage-status',
 
                 'uoms.view',
                 'uoms.create',
@@ -429,6 +435,8 @@ class PermissionSeeder extends Seeder
                 'dashboard.view',
 
                 'items.view',
+                'items.manage-prices',
+                
                 'uoms.view',
                 'categories.view',
                 'suppliers.view',

@@ -92,8 +92,14 @@ class HandleInertiaRequests extends Middleware
 
                         'purchase-orders.view',
                         'goods-receipts.view',
-                        'items.view',
                         'inventory.view',
+
+                        // Items
+                        'items.view',
+                        'items.create',
+                        'items.update',
+                        'items.manage-prices',
+                        'items.manage-status',
                         
                         // User Management
                         'users.view',

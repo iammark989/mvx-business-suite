@@ -16,7 +16,8 @@ class Item extends Model
         'brand_id',
         'purchase_uom_id',
         'selling_uom_id',
-        'purchase_conversion_qty',
+        'purchase_qty',
+        'selling_qty',
         'weight',
         'weight_uom_id',
         'tax_classification',
@@ -26,7 +27,8 @@ class Item extends Model
     protected function casts(): array
     {
         return [
-            'purchase_conversion_qty' => 'decimal:4',
+            'purchase_qty' => 'decimal:4',
+            'selling_qty' => 'decimal:4',
             'weight' => 'decimal:4',
             'is_active' => 'boolean',
         ];

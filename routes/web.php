@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\PriceTypeController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\TaxConfigurationController;
@@ -257,5 +258,30 @@ Route::middleware(['auth', 'verified'])
         Route::patch('/tax-configurations/{taxConfiguration}/status', [TaxConfigurationController::class, 'updateStatus'])
             ->middleware('can:tax-configurations.manage-status')
             ->name('tax-configurations.update-status');
+
+        // Item Master Management
+        Route::get('/items', [ItemController::class, 'index'])
+            ->middleware('can:items.view')
+            ->name('items.index');
+
+        Route::get('/items/create', [ItemController::class, 'create'])
+            ->middleware('can:items.create')
+            ->name('items.create');
+
+        Route::post('/items', [ItemController::class, 'store'])
+            ->middleware('can:items.create')
+            ->name('items.store');
+
+        Route::get('/items/{item}/edit', [ItemController::class, 'edit'])
+            ->middleware('can:items.update')
+            ->name('items.edit');
+
+        Route::put('/items/{item}', [ItemController::class, 'update'])
+            ->middleware('can:items.update')
+            ->name('items.update');
+
+        Route::patch('/items/{item}/status', [ItemController::class, 'updateStatus'])
+            ->middleware('can:items.manage-status')
+            ->name('items.update-status');
     
     });

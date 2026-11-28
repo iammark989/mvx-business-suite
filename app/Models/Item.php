@@ -64,4 +64,14 @@ class Item extends Model
     {
         return $this->hasMany(ItemPrice::class);
     }
+
+    public function inventoryStocks(): HasMany
+    {
+        return $this->hasMany(InventoryStock::class);
+    }
+
+    public function inventoryTransactions(): HasMany
+    {
+        return $this->hasMany(InventoryTransaction::class);
+    }
 }

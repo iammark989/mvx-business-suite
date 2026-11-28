@@ -1,5 +1,5 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { FormEvent } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 type Category = {
     id: number;
@@ -48,6 +48,7 @@ type Item = {
     id: number;
     item_number: string;
     description: string;
+    image: string | null;
     short_description: string | null;
     category_id: number;
     brand_id: number | null;
@@ -92,9 +93,11 @@ export default function Edit() {
 
     const canManagePrices = auth.permissions.includes('items.manage-prices');
 
-    const { data, setData, put, transform, processing, errors } = useForm({
+    const { data, setData, post, transform, processing, errors } = useForm({
         item_number: item.item_number,
         description: item.description,
+        image: null as File | null,
+        remove_image: false,
         short_description: item.short_description ?? '',
         category_id: String(item.category_id),
         brand_id: item.brand_id ? String(item.brand_id) : '',
@@ -118,6 +121,17 @@ export default function Edit() {
             };
         }) as PriceEntry[],
     });
+
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [removeExistingImage, setRemoveExistingImage] = useState(false);
+
+    useEffect(() => {
+        return () => {
+            if (imagePreview) {
+                URL.revokeObjectURL(imagePreview);
+            }
+        };
+    }, [imagePreview]);
 
     const selectedPurchaseUom = uoms.find(
         (uom) => String(uom.id) === data.purchase_uom_id,
@@ -211,19 +225,35 @@ export default function Edit() {
         );
     }
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    function handleSubmit(event: FormEvent) {
         event.preventDefault();
 
         transform((formData) => ({
             ...formData,
+            _method: 'put',
             prices: canManagePrices
                 ? formData.prices.filter(
-                      (price) => price.price.trim() !== '',
-                  )
+                    (price) => price.price.trim() !== '',
+                )
                 : [],
         }));
 
-        put(`/admin/items/${item.id}`);
+        post(`/admin/items/${item.id}`);
+    }
+
+    function handleImageChange(file: File | null) {
+        if (imagePreview) {
+            URL.revokeObjectURL(imagePreview);
+        }
+
+        setData((previous) => ({
+            ...previous,
+            image: file,
+            remove_image: false,
+        }));
+
+        setImagePreview(file ? URL.createObjectURL(file) : null);
+        setRemoveExistingImage(false);
     }
 
     const inputClass =
@@ -282,21 +312,9 @@ export default function Edit() {
                                 <input
                                     id="item_number"
                                     type="text"
-                                    inputMode="numeric"
-                                    maxLength={7}
                                     value={data.item_number}
-                                    onChange={(event) =>
-                                        setData(
-                                            'item_number',
-                                            event.target.value
-                                                .replace(/\D/g, '')
-                                                .slice(0, 7),
-                                        )
-                                    }
-                                    required
-                                    autoComplete="off"
-                                    className={inputClass}
-                                    placeholder="7-digit item number"
+                                    disabled
+                                    className={`${inputClass} cursor-not-allowed bg-muted text-muted-foreground`}
                                 />
                                 {renderError('item_number')}
                             </div>
@@ -348,6 +366,69 @@ export default function Edit() {
                                     placeholder="Short description for invoices and receipts"
                                 />
                                 {renderError('short_description')}
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <label htmlFor="image" className={labelClass}>
+                                    Item Image
+                                    <span className="ml-1 font-normal text-muted-foreground">
+                                        (Optional)
+                                    </span>
+                                </label>
+
+                                {(imagePreview || (item.image && !removeExistingImage)) && (
+                                    <div className="mb-3">
+                                        <img
+                                            src={
+                                                imagePreview ??
+                                                `/storage/${item.image}`
+                                            }
+                                            alt="Item preview"
+                                            className="h-40 w-40 rounded-lg border object-cover"
+                                        />
+                                    </div>
+                                )}
+
+                                <input
+                                    id="image"
+                                    type="file"
+                                    accept=".jpg,.jpeg,.png,.webp"
+                                    onChange={(event) =>
+                                        handleImageChange(event.target.files?.[0] ?? null)
+                                    }
+                                    className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-muted file:px-4 file:py-2 file:text-sm file:font-medium"
+                                />
+
+                                <p className="mt-2 text-xs text-muted-foreground">
+                                    Accepted formats: JPG, JPEG, PNG, WEBP. Maximum file size: 2MB.
+                                </p>
+
+                                {renderError('image')}
+
+                                {(imagePreview || (item.image && !removeExistingImage)) && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (imagePreview) {
+                                                handleImageChange(null);
+                                            } else {
+                                                setRemoveExistingImage(true);
+                                                setData('remove_image', true);
+                                            }
+
+                                            const input = document.getElementById(
+                                                'image',
+                                            ) as HTMLInputElement | null;
+
+                                            if (input) {
+                                                input.value = '';
+                                            }
+                                        }}
+                                        className="mt-3 text-sm font-medium text-destructive hover:underline"
+                                    >
+                                        Remove Image
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>

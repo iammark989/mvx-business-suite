@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
 {
@@ -107,6 +108,7 @@ class ItemController extends Controller
                 'unique:items,item_number',
             ],
             'description' => ['required', 'string', 'max:255'],
+            
             'short_description' => ['nullable', 'string', 'max:100'],
 
             'category_id' => [
@@ -116,6 +118,13 @@ class ItemController extends Controller
             'brand_id' => [
                 'nullable',
                 Rule::exists('brands', 'id')->where('is_active', true),
+            ],
+
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
             ],
 
             'purchase_uom_id' => [
@@ -202,10 +211,13 @@ class ItemController extends Controller
             Gate::authorize('items.manage-prices');
         }
 
-        DB::transaction(function () use ($validated) {
+        $imagePath = $request->file('image')?->store('items', 'public');
+
+        DB::transaction(function () use ($validated, $imagePath) {
             $item = Item::create([
                 'item_number' => $validated['item_number'],
                 'description' => $validated['description'],
+                'image' => $imagePath,
                 'short_description' => $validated['short_description'] ?? null,
                 'category_id' => $validated['category_id'],
                 'brand_id' => $validated['brand_id'] ?? null,
@@ -315,7 +327,7 @@ class ItemController extends Controller
             ],
             'description' => ['required', 'string', 'max:255'],
             'short_description' => ['nullable', 'string', 'max:100'],
-
+            'remove_image' => ['required', 'boolean'],
             'category_id' => [
                 'required',
                 Rule::exists('categories', 'id')->where(function ($query) use ($item) {
@@ -330,6 +342,13 @@ class ItemController extends Controller
                     $query->where('is_active', true)
                         ->orWhere('id', $item->brand_id);
                 }),
+            ],
+
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
             ],
 
             'default_supplier_id' => [
@@ -451,37 +470,63 @@ class ItemController extends Controller
             }
         }
 
-        DB::transaction(function () use ($validated, $item) {
-            $item->update([
-                'item_number' => $validated['item_number'],
-                'description' => $validated['description'],
-                'short_description' => $validated['short_description'] ?? null,
-                'category_id' => $validated['category_id'],
-                'brand_id' => $validated['brand_id'] ?? null,
-                'purchase_uom_id' => $validated['purchase_uom_id'],
-                'selling_uom_id' => $validated['selling_uom_id'],
-                'purchase_qty' => $validated['purchase_qty'],
-                'selling_qty' => $validated['selling_qty'],
-                'default_supplier_id' => $validated['default_supplier_id'] ?? null,
-                'weight_grams' => $validated['weight_grams'] ?? 0,
-                'tax_classification' => $validated['tax_classification'],
-            ]);
+        $oldImagePath = $item->image;
+        $newImagePath = $request->file('image')?->store('items', 'public');
 
-            // Only synchronize submitted price entries.
-            // Existing price records not submitted are preserved.
-            if (array_key_exists('prices', $validated)) {
-                foreach ($validated['prices'] as $price) {
-                    $item->prices()->updateOrCreate(
-                        [
-                            'price_type_id' => $price['price_type_id'],
-                        ],
-                        [
-                            'price' => $price['price'],
-                        ]
-                    );
+        $imagePath = $oldImagePath;
+
+        if ($newImagePath) {
+            $imagePath = $newImagePath;
+        } elseif ($validated['remove_image']) {
+            $imagePath = null;
+        }
+
+        try {
+            DB::transaction(function () use ($validated, $item, $imagePath) {
+                $item->update([
+                    'item_number' => $validated['item_number'],
+                    'description' => $validated['description'],
+                    'image' => $imagePath,
+                    'short_description' => $validated['short_description'] ?? null,
+                    'category_id' => $validated['category_id'],
+                    'brand_id' => $validated['brand_id'] ?? null,
+                    'purchase_uom_id' => $validated['purchase_uom_id'],
+                    'selling_uom_id' => $validated['selling_uom_id'],
+                    'purchase_qty' => $validated['purchase_qty'],
+                    'selling_qty' => $validated['selling_qty'],
+                    'default_supplier_id' => $validated['default_supplier_id'] ?? null,
+                    'weight_grams' => $validated['weight_grams'] ?? 0,
+                    'tax_classification' => $validated['tax_classification'],
+                ]);
+
+                // Only synchronize submitted price entries.
+                // Existing price records not submitted are preserved.
+                if (array_key_exists('prices', $validated)) {
+                    foreach ($validated['prices'] as $price) {
+                        $item->prices()->updateOrCreate(
+                            [
+                                'price_type_id' => $price['price_type_id'],
+                            ],
+                            [
+                                'price' => $price['price'],
+                            ]
+                        );
+                    }
                 }
+            });
+        } catch (\Throwable $exception) {
+            // Clean up the newly uploaded file if the database update fails.
+            if ($newImagePath) {
+                Storage::disk('public')->delete($newImagePath);
             }
-        });
+
+            throw $exception;
+        }
+
+        // Delete the previous image only after the database update succeeds.
+        if ($oldImagePath && $oldImagePath !== $imagePath) {
+            Storage::disk('public')->delete($oldImagePath);
+        }
 
         return redirect()
             ->route('items.index')

@@ -1,5 +1,5 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { FormEvent } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 type Category = {
     id: number;
@@ -57,6 +57,7 @@ export default function Create() {
     const { data, setData, post, transform, processing, errors } = useForm({
         item_number: '',
         description: '',
+        image: null as File | null,
         short_description: '',
         category_id: '',
         brand_id: '',
@@ -72,6 +73,16 @@ export default function Create() {
             price: '',
         })) as PriceEntry[],
     });
+
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (imagePreview) {
+                URL.revokeObjectURL(imagePreview);
+            }
+        };
+    }, [imagePreview]);
 
     const selectedPurchaseUom = uoms.find(
         (uom) => String(uom.id) === data.purchase_uom_id,
@@ -178,6 +189,15 @@ function handleSellingQtyChange(value: string) {
         }));
 
         post('/admin/items');
+    }
+
+    function handleImageChange(file: File | null) {
+        if (imagePreview) {
+            URL.revokeObjectURL(imagePreview);
+        }
+
+        setData('image', file);
+        setImagePreview(file ? URL.createObjectURL(file) : null);
     }
 
     const inputClass =
@@ -293,6 +313,70 @@ function handleSellingQtyChange(value: string) {
                                     placeholder="Short description for invoices and receipts"
                                 />
                                 {renderError('short_description')}
+                            </div>
+
+                                                    {/* Item Image */}
+                            <div className="mt-6">
+                                <label htmlFor="image" className={labelClass}>
+                                    Item Image
+                                    <span className="ml-1 font-normal text-muted-foreground">
+                                        (Optional)
+                                    </span>
+                                </label>
+
+                                <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                                    {imagePreview && (
+                                        <div className="relative h-36 w-36 overflow-hidden rounded-lg border bg-muted">
+                                            <img
+                                                src={imagePreview}
+                                                alt="Item image preview"
+                                                className="h-full w-full object-contain"
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="flex-1">
+                                        <input
+                                            id="image"
+                                            type="file"
+                                            accept=".jpg,.jpeg,.png,.webp"
+                                            onChange={(event) =>
+                                                handleImageChange(
+                                                    event.target.files?.[0] ?? null,
+                                                )
+                                            }
+                                            className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground hover:file:opacity-90"
+                                        />
+
+                                        <p className="mt-2 text-xs text-muted-foreground">
+                                            Supported formats: JPG, JPEG, PNG, WEBP.
+                                            Maximum file size: 2MB.
+                                        </p>
+
+                                        {renderError('image')}
+
+                                        {imagePreview && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    handleImageChange(null);
+
+                                                    const input =
+                                                        document.getElementById(
+                                                            'image',
+                                                        ) as HTMLInputElement;
+
+                                                    if (input) {
+                                                        input.value = '';
+                                                    }
+                                                }}
+                                                className="mt-3 text-sm font-medium text-destructive hover:underline"
+                                            >
+                                                Remove Image
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

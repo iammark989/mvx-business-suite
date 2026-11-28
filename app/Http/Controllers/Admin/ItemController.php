@@ -3,17 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Item;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use Inertia\Inertia;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Item;
 use App\Models\PriceType;
+use App\Models\Supplier;
 use App\Models\Uom;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class ItemController extends Controller
 {
@@ -77,6 +78,11 @@ class ItemController extends Controller
                 ->orderBy('name')
                 ->get(['id', 'name']),
 
+            'suppliers' => Supplier::query()
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'code', 'name']), 
+
             'uoms' => Uom::query()
                 ->where('is_active', true)
                 ->orderBy('code')
@@ -116,14 +122,21 @@ class ItemController extends Controller
                 'required',
                 Rule::exists('uoms', 'id')->where('is_active', true),
             ],
+
             'selling_uom_id' => [
                 'required',
                 Rule::exists('uoms', 'id')->where('is_active', true),
             ],
+
             'purchase_qty' => [
                 'required',
                 'numeric',
                 'gt:0',
+            ],
+
+            'default_supplier_id' => [
+                'nullable',
+                Rule::exists('suppliers', 'id')->where('is_active', true),
             ],
 
             'selling_qty' => [
@@ -132,13 +145,10 @@ class ItemController extends Controller
                 'gt:0',
             ],
 
-            'weight' => ['nullable', 'numeric', 'gt:0'],
-            'weight_uom_id' => [
+            'weight_grams' => [
                 'nullable',
-                'required_with:weight',
-                Rule::exists('uoms', 'id')
-                    ->where('is_active', true)
-                    ->where('measurement_type', 'weight'),
+                'numeric',
+                'min:0',
             ],
 
             'tax_classification' => [
@@ -188,16 +198,6 @@ class ItemController extends Controller
             ]);
         }
 
-        // Weight and weight UOM must either both be provided or both be empty.
-        if (
-            ($validated['weight'] ?? null) !== null
-            && empty($validated['weight_uom_id'])
-        ) {
-            throw ValidationException::withMessages([
-                'weight_uom_id' => 'Please select a weight UOM.',
-            ]);
-        }
-
         if (!empty($validated['prices'])) {
             Gate::authorize('items.manage-prices');
         }
@@ -213,8 +213,8 @@ class ItemController extends Controller
                 'selling_uom_id' => $validated['selling_uom_id'],
                 'purchase_qty' => $validated['purchase_qty'],
                 'selling_qty' => $validated['selling_qty'],
-                'weight' => $validated['weight'] ?? null,
-                'weight_uom_id' => $validated['weight_uom_id'] ?? null,
+                'default_supplier_id' => $validated['default_supplier_id'] ?? null,
+                'weight_grams' => $validated['weight_grams'] ?? 0,
                 'tax_classification' => $validated['tax_classification'],
                 'is_active' => true,
             ]);
@@ -241,7 +241,7 @@ class ItemController extends Controller
             'brand',
             'purchaseUom',
             'sellingUom',
-            'weightUom',
+            'defaultSupplier',
             'prices.priceType',
         ]);
 
@@ -267,14 +267,24 @@ class ItemController extends Controller
                 ->orderBy('name')
                 ->get(['id', 'name', 'is_active']),
 
+            'suppliers' => Supplier::query()
+            ->where(function ($query) use ($item) {
+                $query->where('is_active', true);
+
+                if ($item->default_supplier_id) {
+                    $query->orWhere('id', $item->default_supplier_id);
+                }
+            })
+            ->orderBy('name')
+            ->get(['id', 'code', 'name', 'is_active']),
+
             'uoms' => Uom::query()
                 ->where(function ($query) use ($item) {
                     $query->where('is_active', true)
-                        ->orWhereIn('id', array_filter([
+                        ->orWhereIn('id', [
                             $item->purchase_uom_id,
                             $item->selling_uom_id,
-                            $item->weight_uom_id,
-                        ]));
+                        ]);
                 })
                 ->orderBy('code')
                 ->get(['id', 'code', 'name', 'measurement_type', 'is_active']),
@@ -322,6 +332,14 @@ class ItemController extends Controller
                 }),
             ],
 
+            'default_supplier_id' => [
+                'nullable',
+                Rule::exists('suppliers', 'id')->where(function ($query) use ($item) {
+                    $query->where('is_active', true)
+                        ->orWhere('id', $item->default_supplier_id);
+                }),
+            ],
+
             'purchase_uom_id' => [
                 'required',
                 Rule::exists('uoms', 'id')->where(function ($query) use ($item) {
@@ -349,16 +367,10 @@ class ItemController extends Controller
                 'gt:0',
             ],
 
-            'weight' => ['nullable', 'numeric', 'gt:0'],
-            'weight_uom_id' => [
+            'weight_grams' => [
                 'nullable',
-                'required_with:weight',
-                Rule::exists('uoms', 'id')->where(function ($query) use ($item) {
-                    $query->where(function ($query) {
-                        $query->where('is_active', true)
-                            ->where('measurement_type', 'weight');
-                    })->orWhere('id', $item->weight_uom_id);
-                }),
+                'numeric',
+                'min:0',
             ],
 
             'tax_classification' => [
@@ -405,20 +417,11 @@ class ItemController extends Controller
 
         if (
             (int) $validated['purchase_uom_id'] === (int) $validated['selling_uom_id']
-            && (float) $validated['purchase_conversion_qty'] !== 1.0
+            && round((float) $validated['purchase_qty'], 4) !==
+                round((float) $validated['selling_qty'], 4)
         ) {
             throw ValidationException::withMessages([
-                'purchase_conversion_qty' => 'Conversion quantity must be 1 when purchase and selling UOM are the same.',
-            ]);
-        }
-
-        // Validate weight and weight UOM pairing.
-        $hasWeight = ($validated['weight'] ?? null) !== null;
-        $hasWeightUom = !empty($validated['weight_uom_id']);
-
-        if ($hasWeight !== $hasWeightUom) {
-            throw ValidationException::withMessages([
-                'weight_uom_id' => 'Weight and weight UOM must either both be provided or both be empty.',
+                'selling_qty' => 'Purchase and selling quantities must be equal when both UOMs are the same.',
             ]);
         }
 
@@ -459,8 +462,8 @@ class ItemController extends Controller
                 'selling_uom_id' => $validated['selling_uom_id'],
                 'purchase_qty' => $validated['purchase_qty'],
                 'selling_qty' => $validated['selling_qty'],
-                'weight' => $validated['weight'] ?? null,
-                'weight_uom_id' => $validated['weight_uom_id'] ?? null,
+                'default_supplier_id' => $validated['default_supplier_id'] ?? null,
+                'weight_grams' => $validated['weight_grams'] ?? 0,
                 'tax_classification' => $validated['tax_classification'],
             ]);
 

@@ -14,12 +14,12 @@ class Item extends Model
         'short_description',
         'category_id',
         'brand_id',
+        'default_supplier_id',
         'purchase_uom_id',
         'selling_uom_id',
         'purchase_qty',
         'selling_qty',
-        'weight',
-        'weight_uom_id',
+        'weight_grams',
         'tax_classification',
         'is_active',
     ];
@@ -29,7 +29,7 @@ class Item extends Model
         return [
             'purchase_qty' => 'decimal:4',
             'selling_qty' => 'decimal:4',
-            'weight' => 'decimal:4',
+            'weight_grams' => 'decimal:4',
             'is_active' => 'boolean',
         ];
     }
@@ -49,14 +49,14 @@ class Item extends Model
         return $this->belongsTo(Uom::class, 'purchase_uom_id');
     }
 
+    public function defaultSupplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class, 'default_supplier_id');
+    }
+
     public function sellingUom(): BelongsTo
     {
         return $this->belongsTo(Uom::class, 'selling_uom_id');
-    }
-
-    public function weightUom(): BelongsTo
-    {
-        return $this->belongsTo(Uom::class, 'weight_uom_id');
     }
 
     public function prices(): HasMany

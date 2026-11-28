@@ -13,6 +13,12 @@ type Brand = {
     name: string;
 };
 
+type Supplier = {
+    id: number;
+    code: string;
+    name: string;
+};
+
 type Uom = {
     id: number;
     code: string;
@@ -32,6 +38,7 @@ type PageProps = {
     };
     categories: Category[];
     brands: Brand[];
+    suppliers: Supplier[];
     uoms: Uom[];
     priceTypes: PriceType[];
 };
@@ -42,7 +49,7 @@ type PriceEntry = {
 };
 
 export default function Create() {
-    const { auth, categories, brands, uoms, priceTypes } =
+    const { auth, categories, brands, suppliers, uoms, priceTypes } =
         usePage<PageProps>().props;
 
     const canManagePrices = auth.permissions.includes('items.manage-prices');
@@ -53,12 +60,12 @@ export default function Create() {
         short_description: '',
         category_id: '',
         brand_id: '',
+        default_supplier_id: '',
         purchase_uom_id: '',
         selling_uom_id: '',
         purchase_qty: '1',
         selling_qty: '1',
-        weight: '',
-        weight_uom_id: '',
+        weight_grams: '0',
         tax_classification: 'VAT',
         prices: priceTypes.map((priceType) => ({
             price_type_id: priceType.id,
@@ -81,10 +88,6 @@ export default function Create() {
                   selectedPurchaseUom.measurement_type,
           )
         : uoms;
-
-    const weightUomOptions = uoms.filter(
-        (uom) => uom.measurement_type === 'weight',
-    );
 
     function handlePurchaseUomChange(value: string) {
     const purchaseUom = uoms.find(
@@ -294,6 +297,38 @@ function handleSellingQtyChange(value: string) {
                         </div>
                     </div>
 
+                    {/** Default Supplier */}                    
+                    <div>
+                        <label
+                            htmlFor="default_supplier_id"
+                            className={labelClass}
+                        >
+                            Default Supplier
+                            <span className="ml-1 font-normal text-muted-foreground">
+                                (Optional)
+                            </span>
+                        </label>
+
+                        <select
+                            id="default_supplier_id"
+                            value={data.default_supplier_id}
+                            onChange={(event) =>
+                                setData('default_supplier_id', event.target.value)
+                            }
+                            className={selectClass}
+                        >
+                            <option value="">No default supplier</option>
+
+                            {suppliers.map((supplier) => (
+                                <option key={supplier.id} value={supplier.id}>
+                                    {supplier.code} - {supplier.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        {renderError('default_supplier_id')}
+                    </div>
+
                     {/* Classification */}
                     <div className="rounded-xl border bg-card p-6">
                         <div className="mb-6">
@@ -389,7 +424,7 @@ function handleSellingQtyChange(value: string) {
                         <div className="mb-6">
                             <h2 className="font-semibold">Units of Measure</h2>
                             <p className="mt-1 text-sm text-muted-foreground">
-                                Configure purchasing and selling units and their conversion.
+                                Enter the equivalent quantities for the purchase and selling units.
                             </p>
                         </div>
 
@@ -424,7 +459,7 @@ function handleSellingQtyChange(value: string) {
                         {/* Purchase Quantity */}
                         <div>
                             <label htmlFor="purchase_qty" className={labelClass}>
-                                Purchase Quantity
+                                Quantity of Purchase UOM
                             </label>
 
                             <input
@@ -475,7 +510,7 @@ function handleSellingQtyChange(value: string) {
                         {/* Selling Quantity */}
                         <div>
                             <label htmlFor="selling_qty" className={labelClass}>
-                                Selling Quantity
+                                Equivalent Selling Quantity
                             </label>
 
                             <input
@@ -523,62 +558,42 @@ function handleSellingQtyChange(value: string) {
                     </div>
                     </div>
 
-                    {/* Weight */}
+                    {/* Weight Information */}
                     <div className="rounded-xl border bg-card p-6">
                         <div className="mb-6">
                             <h2 className="font-semibold">Weight Information</h2>
                             <p className="mt-1 text-sm text-muted-foreground">
-                                Weight is optional. Provide both fields if applicable.
+                                Enter the estimated weight of one purchase UOM in grams.
                             </p>
                         </div>
 
-                        <div className="grid gap-5 md:grid-cols-2">
-                            <div>
-                                <label htmlFor="weight" className={labelClass}>
-                                    Weight
-                                    <span className="ml-1 font-normal text-muted-foreground">
-                                        (Optional)
-                                    </span>
-                                </label>
-                                <input
-                                    id="weight"
-                                    type="number"
-                                    min="0.0001"
-                                    step="0.0001"
-                                    value={data.weight}
-                                    onChange={(event) =>
-                                        setData('weight', event.target.value)
-                                    }
-                                    className={inputClass}
-                                    placeholder="Enter item weight"
-                                />
-                                {renderError('weight')}
-                            </div>
+                        <div className="max-w-md">
+                            <label htmlFor="weight_grams" className={labelClass}>
+                                Estimated Weight (grams)
+                                <span className="ml-1 font-normal text-muted-foreground">
+                                    (Optional)
+                                </span>
+                            </label>
 
-                            <div>
-                                <label
-                                    htmlFor="weight_uom_id"
-                                    className={labelClass}
-                                >
-                                    Weight UOM
-                                </label>
-                                <select
-                                    id="weight_uom_id"
-                                    value={data.weight_uom_id}
-                                    onChange={(event) =>
-                                        setData('weight_uom_id', event.target.value)
-                                    }
-                                    className={selectClass}
-                                >
-                                    <option value="">Select weight UOM</option>
-                                    {weightUomOptions.map((uom) => (
-                                        <option key={uom.id} value={uom.id}>
-                                            {uom.code} - {uom.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                {renderError('weight_uom_id')}
-                            </div>
+                            <input
+                                id="weight_grams"
+                                type="number"
+                                min="0"
+                                step="0.0001"
+                                value={data.weight_grams}
+                                onChange={(event) =>
+                                    setData('weight_grams', event.target.value)
+                                }
+                                className={inputClass}
+                                placeholder="Enter estimated weight in grams"
+                            />
+
+                            {renderError('weight_grams')}
+
+                            <p className="mt-2 text-xs text-muted-foreground">
+                                Estimated weight of the purchase item. Example: 25000g or
+                                25KG for 1 CASE. Leave as 0 if unknown.
+                            </p>
                         </div>
                     </div>
 
